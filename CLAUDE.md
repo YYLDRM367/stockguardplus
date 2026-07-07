@@ -1,8 +1,10 @@
 # CLAUDE.md — StockGuard+
 
-**Status: pre-code.** This file records the decisions made before scaffolding
-started. Nothing exists in this repo yet — the first work session should
-scaffold the Android project against everything below, not re-derive it.
+**Status: scaffolded, not yet functional.** The Gradle project, navigation
+graph, theme, and placeholder screens exist. There is no Firebase wiring and
+no real data layer yet — `data/sample/SampleProducts.kt` stands in for the
+Firestore repository described below. Next work session should replace that
+with a real repository, not add more UI on top of it.
 
 ## What this is
 
@@ -114,6 +116,26 @@ languages are translated:
 - CSV / Excel import-export
 - Spanish, French, German translations
 - iOS port
+
+## Local setup (first run)
+
+Nothing here has been built or run yet — this machine has no JDK, Android
+SDK, or Gradle installed, so the scaffold was written by hand and not
+compiled. First person to open it in Android Studio should expect to fix
+small issues.
+
+1. Install **Android Studio** (Koala or newer) — it bundles a compatible JDK.
+2. Open this folder as a project. `gradlew`/the Gradle wrapper jar are not
+   checked in; Android Studio will offer to generate them on first sync —
+   accept that. It will also create `local.properties` pointing at your SDK.
+3. Firebase isn't wired yet. To enable it: create a project at
+   [console.firebase.google.com], add an Android app with package name
+   `com.stockguardplus.app`, download `google-services.json` into `app/`,
+   then uncomment the `google-services` plugin lines in `build.gradle.kts`
+   (root) and `app/build.gradle.kts`.
+4. Until step 3 is done, the app runs on the hardcoded `SampleProducts` list
+   — Dashboard and Product list work, everything else is a "coming soon"
+   placeholder screen.
 
 ## Release process
 

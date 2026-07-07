@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">StockGuard+</string>
+
+    <string name="onboarding_subtitle">Stoğu, lokasyonları ve yeniden siparişleri tek yerden takip et.</string>
+    <string name="onboarding_continue">Devam Et</string>
+
+    <string name="tab_dashboard">Panel</string>
+    <string name="tab_products">Ürünler</string>
+    <string name="tab_alerts">Uyarılar</string>
+    <string name="tab_settings">Ayarlar</string>
+
+    <string name="stat_total_products">Ürün</string>
+    <string name="stat_low_stock">Az Stok</string>
+    <string name="stat_out_of_stock">Tükendi</string>
+
+    <string name="action_add_product">Ürün ekle</string>
+
+    <string name="status_in_stock">Stokta</string>
+    <string name="status_low_stock">Az Kaldı</string>
+    <string name="status_out_of_stock">Tükendi</string>
+
+    <string name="screen_product_detail">Ürün detayı</string>
+    <string name="screen_add_product">Ürün ekle</string>
+    <string name="screen_edit_product">Ürünü düzenle</string>
+    <string name="screen_categories">Kategoriler</string>
+
+    <string name="placeholder_coming_soon">Bu ekran yakında hazır olacak.</string>
+</resources>
