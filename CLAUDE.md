@@ -1,10 +1,11 @@
 # CLAUDE.md — StockGuard+
 
-**Status: scaffolded, not yet functional.** The Gradle project, navigation
-graph, theme, and placeholder screens exist. There is no Firebase wiring and
-no real data layer yet — `data/sample/SampleProducts.kt` stands in for the
-Firestore repository described below. Next work session should replace that
-with a real repository, not add more UI on top of it.
+**Status: scaffolded and builds.** The Gradle project, navigation graph,
+theme, and placeholder screens exist and `assembleDebug` succeeds (verified
+2026-07-08). There is no Firebase wiring and no real data layer yet —
+`data/sample/SampleProducts.kt` stands in for the Firestore repository
+described below. Next work session should replace that with a real
+repository, not add more UI on top of it.
 
 ## What this is
 
@@ -119,23 +120,24 @@ languages are translated:
 
 ## Local setup (first run)
 
-Nothing here has been built or run yet — this machine has no JDK, Android
-SDK, or Gradle installed, so the scaffold was written by hand and not
-compiled. First person to open it in Android Studio should expect to fix
-small issues.
+Android Studio, the Android SDK, and a real Gradle wrapper are already set
+up on the dev machine and `gradlew assembleDebug` is verified working.
+compileSdk/targetSdk are 35; the installed SDK also has platform 36.1 if a
+future bump is needed.
 
-1. Install **Android Studio** (Koala or newer) — it bundles a compatible JDK.
-2. Open this folder as a project. `gradlew`/the Gradle wrapper jar are not
-   checked in; Android Studio will offer to generate them on first sync —
-   accept that. It will also create `local.properties` pointing at your SDK.
-3. Firebase isn't wired yet. To enable it: create a project at
+1. Open this folder in **Android Studio** — it should sync without needing
+   to regenerate the wrapper.
+2. Firebase isn't wired yet. To enable it: create a project at
    [console.firebase.google.com], add an Android app with package name
    `com.stockguardplus.app`, download `google-services.json` into `app/`,
    then uncomment the `google-services` plugin lines in `build.gradle.kts`
    (root) and `app/build.gradle.kts`.
-4. Until step 3 is done, the app runs on the hardcoded `SampleProducts` list
+3. Until step 2 is done, the app runs on the hardcoded `SampleProducts` list
    — Dashboard and Product list work, everything else is a "coming soon"
    placeholder screen.
+4. `TopAppBar` needs `ExperimentalMaterial3Api` opt-in — this is enabled
+   project-wide via `freeCompilerArgs` in `app/build.gradle.kts`, don't
+   re-add per-function `@OptIn` annotations for it.
 
 ## Release process
 
