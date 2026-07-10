@@ -1,9 +1,10 @@
 # CLAUDE.md — StockGuard+
 
 **Status: Auth + Firestore wired, core loop works.** Sign up (email/password,
-creates an org), sign in, sign out, Dashboard, Product list, and Add product
-are backed by real Firestore data — verified end to end on a physical device
-2026-07-10. Product detail, edit product, categories, low-stock alerts, and
+creates an org), sign in, sign out, Dashboard, Product list, Add product, and
+Category management (add/rename/delete, with delete reassigning affected
+products to "Uncategorized") are backed by real Firestore data — verified
+end to end 2026-07-10. Product detail, edit product, low-stock alerts, and
 barcode scanning are still placeholder screens. Google Sign-In is declared in
 the stack but not implemented yet (needs a SHA-1 fingerprint added in the
 Firebase console first).
@@ -46,10 +47,10 @@ Roadmap), this needs a real `uid -> orgId` lookup and `firestore.rules` (repo
 root) needs updating to match — right now its `orgId == request.auth.uid`
 check would block any invited employee.
 - `organizations/{orgId}/products/{productId}` — name, SKU, barcode,
-  categoryId, unit, reorderPoint, photoUrl (optional). **Current code stores
-  `category` as a free-text field, not a `categoryId` reference** — that
-  becomes a real relation once category management (below) is built; don't
-  build a category picker against today's field without doing that first.
+  categoryId, unit, reorderPoint, photoUrl (optional). `categoryId` is a
+  real reference into `categories` (empty string = uncategorized); deleting
+  a category reassigns its products to `categoryId = ""` via a batch write
+  in `FirebaseCategoryRepository.deleteCategory`.
 - `organizations/{orgId}/categories/{categoryId}` — name, sortOrder
 - `organizations/{orgId}/locations/{locationId}` — name (v1: single implicit
   location, schema ready for multi-warehouse)

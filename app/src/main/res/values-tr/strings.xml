@@ -40,4 +40,12 @@
     <string name="action_save">Kaydet</string>
     <string name="products_empty">Henüz ürün yok. Eklemek için + simgesine dokun.</string>
     <string name="action_sign_out">Çıkış yap</string>
+
+    <string name="field_new_category_name">Yeni kategori adı</string>
+    <string name="action_add">Ekle</string>
+    <string name="action_rename">Yeniden adlandır</string>
+    <string name="action_delete">Sil</string>
+    <string name="action_cancel">İptal</string>
+    <string name="category_uncategorized">Kategorisiz</string>
+    <string name="action_add_category">+ Yeni kategori ekle</string>
 </resources>

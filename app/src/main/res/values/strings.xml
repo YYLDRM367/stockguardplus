@@ -40,4 +40,12 @@
     <string name="action_save">Save</string>
     <string name="products_empty">No products yet. Tap + to add one.</string>
     <string name="action_sign_out">Sign out</string>
+
+    <string name="field_new_category_name">New category name</string>
+    <string name="action_add">Add</string>
+    <string name="action_rename">Rename</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="category_uncategorized">Uncategorized</string>
+    <string name="action_add_category">+ Add new category</string>
 </resources>

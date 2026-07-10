@@ -8,7 +8,7 @@ data class Product(
     val sku: String = "",
     val quantity: Int = 0,
     val reorderPoint: Int = 0,
-    val category: String = ""
+    val categoryId: String = ""
 ) {
     val status: StockStatus
         get() = when {

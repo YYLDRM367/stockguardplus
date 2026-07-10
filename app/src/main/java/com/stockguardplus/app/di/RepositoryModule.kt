@@ -1,7 +1,9 @@
 package com.stockguardplus.app.di
 
 import com.stockguardplus.app.data.repository.AuthRepository
+import com.stockguardplus.app.data.repository.CategoryRepository
 import com.stockguardplus.app.data.repository.FirebaseAuthRepository
+import com.stockguardplus.app.data.repository.FirebaseCategoryRepository
 import com.stockguardplus.app.data.repository.FirebaseProductRepository
 import com.stockguardplus.app.data.repository.ProductRepository
 import dagger.Binds
@@ -21,4 +23,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindProductRepository(impl: FirebaseProductRepository): ProductRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindCategoryRepository(impl: FirebaseCategoryRepository): CategoryRepository
 }

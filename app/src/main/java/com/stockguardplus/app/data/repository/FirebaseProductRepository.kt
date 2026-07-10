@@ -43,7 +43,7 @@ class FirebaseProductRepository @Inject constructor(
             "sku" to product.sku,
             "quantity" to product.quantity,
             "reorderPoint" to product.reorderPoint,
-            "category" to product.category
+            "categoryId" to product.categoryId
         )
 
         firestore.collection("organizations")
