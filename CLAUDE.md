@@ -1,11 +1,12 @@
 # CLAUDE.md — StockGuard+
 
-**Status: scaffolded and builds.** The Gradle project, navigation graph,
-theme, and placeholder screens exist and `assembleDebug` succeeds (verified
-2026-07-08). There is no Firebase wiring and no real data layer yet —
-`data/sample/SampleProducts.kt` stands in for the Firestore repository
-described below. Next work session should replace that with a real
-repository, not add more UI on top of it.
+**Status: Auth + Firestore wired, core loop works.** Sign up (email/password,
+creates an org), sign in, sign out, Dashboard, Product list, and Add product
+are backed by real Firestore data — verified end to end on a physical device
+2026-07-10. Product detail, edit product, categories, low-stock alerts, and
+barcode scanning are still placeholder screens. Google Sign-In is declared in
+the stack but not implemented yet (needs a SHA-1 fingerprint added in the
+Firebase console first).
 
 ## What this is
 
@@ -37,8 +38,18 @@ is expensive, doing it now is nearly free.
 - `organizations/{orgId}` — name, language, subscription state (plan, expiry)
 - `organizations/{orgId}/members/{userId}` — role (`owner`/`employee`); only
   `owner` is used in v1, schema is ready for team invites later
+
+**v1 shortcut:** `orgId` is literally the owner's Firebase Auth `uid` — there
+is no separate lookup collection to map a user to their org. This only works
+because v1 has no team invites yet. When employee accounts are built (see
+Roadmap), this needs a real `uid -> orgId` lookup and `firestore.rules` (repo
+root) needs updating to match — right now its `orgId == request.auth.uid`
+check would block any invited employee.
 - `organizations/{orgId}/products/{productId}` — name, SKU, barcode,
-  categoryId, unit, reorderPoint, photoUrl (optional)
+  categoryId, unit, reorderPoint, photoUrl (optional). **Current code stores
+  `category` as a free-text field, not a `categoryId` reference** — that
+  becomes a real relation once category management (below) is built; don't
+  build a category picker against today's field without doing that first.
 - `organizations/{orgId}/categories/{categoryId}` — name, sortOrder
 - `organizations/{orgId}/locations/{locationId}` — name (v1: single implicit
   location, schema ready for multi-warehouse)
@@ -127,17 +138,18 @@ future bump is needed.
 
 1. Open this folder in **Android Studio** — it should sync without needing
    to regenerate the wrapper.
-2. Firebase isn't wired yet. To enable it: create a project at
-   [console.firebase.google.com], add an Android app with package name
-   `com.stockguardplus.app`, download `google-services.json` into `app/`,
-   then uncomment the `google-services` plugin lines in `build.gradle.kts`
-   (root) and `app/build.gradle.kts`.
-3. Until step 2 is done, the app runs on the hardcoded `SampleProducts` list
-   — Dashboard and Product list work, everything else is a "coming soon"
-   placeholder screen.
-4. `TopAppBar` needs `ExperimentalMaterial3Api` opt-in — this is enabled
+2. Firebase is wired: a project exists, `google-services.json` is in `app/`
+   (gitignored — every dev machine needs their own copy from the Firebase
+   console), Firestore and Email/Password Auth are enabled. Firestore is
+   still in **test mode** in the console — `firestore.rules` (repo root) has
+   the real rules but they haven't been pasted into the console's Rules tab
+   yet. Do that before this goes anywhere near real user data.
+3. `TopAppBar` needs `ExperimentalMaterial3Api` opt-in — this is enabled
    project-wide via `freeCompilerArgs` in `app/build.gradle.kts`, don't
    re-add per-function `@OptIn` annotations for it.
+4. To install on a physical device: enable Developer Options + USB debugging
+   on the phone, connect via USB, confirm the RSA prompt on the device, then
+   `adb install -r app/build/outputs/apk/debug/app-debug.apk`.
 
 ## Release process
 

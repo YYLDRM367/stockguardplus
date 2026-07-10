@@ -11,10 +11,15 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.stockguardplus.app.R
 
 @Composable
-fun SettingsScreen(onManageCategories: () -> Unit) {
+fun SettingsScreen(
+    onManageCategories: () -> Unit,
+    onSignedOut: () -> Unit,
+    viewModel: SettingsViewModel = hiltViewModel()
+) {
     Scaffold(topBar = { TopAppBar(title = { Text(stringResource(R.string.tab_settings)) }) }) { innerPadding ->
         Column(
             modifier = Modifier
@@ -24,6 +29,13 @@ fun SettingsScreen(onManageCategories: () -> Unit) {
             ListItem(
                 headlineContent = { Text(stringResource(R.string.screen_categories)) },
                 modifier = Modifier.clickable(onClick = onManageCategories)
+            )
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.action_sign_out)) },
+                modifier = Modifier.clickable {
+                    viewModel.signOut()
+                    onSignedOut()
+                }
             )
         }
     }

@@ -2,7 +2,13 @@
     <string name="app_name">StockGuard+</string>
 
     <string name="onboarding_subtitle">Stoğu, lokasyonları ve yeniden siparişleri tek yerden takip et.</string>
-    <string name="onboarding_continue">Devam Et</string>
+    <string name="onboarding_business_name">İşletme adı</string>
+    <string name="onboarding_email">E-posta</string>
+    <string name="onboarding_password">Şifre</string>
+    <string name="onboarding_sign_up">Kayıt ol</string>
+    <string name="onboarding_sign_in">Giriş yap</string>
+    <string name="onboarding_toggle_to_sign_in">Zaten hesabın var mı? Giriş yap</string>
+    <string name="onboarding_toggle_to_sign_up">Hesabın yok mu? Kayıt ol</string>
 
     <string name="tab_dashboard">Panel</string>
     <string name="tab_products">Ürünler</string>
@@ -25,4 +31,13 @@
     <string name="screen_categories">Kategoriler</string>
 
     <string name="placeholder_coming_soon">Bu ekran yakında hazır olacak.</string>
+
+    <string name="field_product_name">Ürün adı</string>
+    <string name="field_sku">SKU</string>
+    <string name="field_quantity">Miktar</string>
+    <string name="field_reorder_point">Yeniden sipariş noktası</string>
+    <string name="field_category">Kategori</string>
+    <string name="action_save">Kaydet</string>
+    <string name="products_empty">Henüz ürün yok. Eklemek için + simgesine dokun.</string>
+    <string name="action_sign_out">Çıkış yap</string>
 </resources>

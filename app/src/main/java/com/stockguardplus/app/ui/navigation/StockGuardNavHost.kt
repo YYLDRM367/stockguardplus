@@ -25,6 +25,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.stockguardplus.app.R
 import com.stockguardplus.app.ui.screens.alerts.LowStockAlertsScreen
 import com.stockguardplus.app.ui.screens.categories.CategoriesScreen
@@ -45,7 +46,7 @@ private val bottomTabs = listOf(
 )
 
 @Composable
-fun StockGuardNavHost() {
+fun StockGuardNavHost(navStartViewModel: NavStartViewModel = hiltViewModel()) {
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
@@ -79,12 +80,12 @@ fun StockGuardNavHost() {
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Screen.Onboarding.route,
+            startDestination = navStartViewModel.startDestination,
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.Onboarding.route) {
                 OnboardingScreen(
-                    onContinue = {
+                    onSignedIn = {
                         navController.navigate(Screen.Dashboard.route) {
                             popUpTo(Screen.Onboarding.route) { inclusive = true }
                         }
@@ -117,7 +118,7 @@ fun StockGuardNavHost() {
                 )
             ) { entry ->
                 val productId = entry.arguments?.getString("productId")
-                AddEditProductScreen(productId = productId)
+                AddEditProductScreen(productId = productId, onSaved = { navController.popBackStack() })
             }
             composable(Screen.Categories.route) {
                 CategoriesScreen()
@@ -126,7 +127,14 @@ fun StockGuardNavHost() {
                 LowStockAlertsScreen()
             }
             composable(Screen.Settings.route) {
-                SettingsScreen(onManageCategories = { navController.navigate(Screen.Categories.route) })
+                SettingsScreen(
+                    onManageCategories = { navController.navigate(Screen.Categories.route) },
+                    onSignedOut = {
+                        navController.navigate(Screen.Onboarding.route) {
+                            popUpTo(navController.graph.id) { inclusive = true }
+                        }
+                    }
+                )
             }
         }
     }

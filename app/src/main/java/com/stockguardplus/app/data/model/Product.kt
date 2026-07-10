@@ -1,12 +1,14 @@
 package com.stockguardplus.app.data.model
 
+import com.google.firebase.firestore.DocumentId
+
 data class Product(
-    val id: String,
-    val name: String,
-    val sku: String,
-    val quantity: Int,
-    val reorderPoint: Int,
-    val category: String
+    @DocumentId val id: String = "",
+    val name: String = "",
+    val sku: String = "",
+    val quantity: Int = 0,
+    val reorderPoint: Int = 0,
+    val category: String = ""
 ) {
     val status: StockStatus
         get() = when {

@@ -9,19 +9,21 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.stockguardplus.app.R
 import com.stockguardplus.app.data.model.StockStatus
-import com.stockguardplus.app.data.sample.SampleProducts
 import com.stockguardplus.app.ui.components.StatCard
 import com.stockguardplus.app.ui.theme.StockBad
 import com.stockguardplus.app.ui.theme.StockWarn
 
 @Composable
-fun DashboardScreen() {
-    val products = SampleProducts.list
+fun DashboardScreen(viewModel: DashboardViewModel = hiltViewModel()) {
+    val products by viewModel.products.collectAsState()
     val lowStockCount = products.count { it.status == StockStatus.LOW_STOCK }
     val outOfStockCount = products.count { it.status == StockStatus.OUT_OF_STOCK }
 
