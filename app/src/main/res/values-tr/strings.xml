@@ -12,6 +12,7 @@
 
     <string name="tab_dashboard">Panel</string>
     <string name="tab_products">Ürünler</string>
+    <string name="tab_orders">Siparişler</string>
     <string name="tab_alerts">Uyarılar</string>
     <string name="tab_settings">Ayarlar</string>
 
@@ -33,6 +34,7 @@
     <string name="placeholder_coming_soon">Bu ekran yakında hazır olacak.</string>
 
     <string name="field_product_name">Ürün adı</string>
+    <string name="field_product">Ürün</string>
     <string name="field_sku">SKU</string>
     <string name="field_quantity">Miktar</string>
     <string name="field_reorder_point">Yeniden sipariş noktası</string>
@@ -78,10 +80,31 @@
     <string name="action_grant_permission">İzin ver</string>
     <string name="product_not_found_by_barcode">Bu barkoda ait bir ürün bulunamadı.</string>
     <string name="action_add_product_with_barcode">Bu barkodla yeni ürün ekle</string>
-    <string name="quantity_edit_hint">Mevcut miktar: %1$s. Değiştirmek için ürün detayındaki Stok Girişi / Çıkışı\'nı kullan.</string>
+    <string name="quantity_edit_hint">Mevcut miktar: %1$s. Değiştirmek için bir satın alma ya da satış siparişi oluştur.</string>
 
     <string name="field_language">Dil</string>
     <string name="language_system">Sistem varsayılanı</string>
     <string name="language_turkish">Türkçe</string>
     <string name="language_english">İngilizce</string>
+
+    <string name="order_tab_purchase">Satın Alma</string>
+    <string name="order_tab_sale">Satış</string>
+    <string name="orders_empty">Henüz sipariş yok. Eklemek için + simgesine dokun.</string>
+    <string name="field_order_number">Sipariş / fatura no</string>
+    <string name="screen_create_purchase_order">Yeni satın alma siparişi</string>
+    <string name="screen_create_sale_order">Yeni satış siparişi</string>
+    <string name="field_order_lines">Kalemler</string>
+    <string name="action_add_line">+ Satır ekle</string>
+    <string name="action_remove_line">Satırı sil</string>
+    <string name="error_order_number_required">Sipariş numarası gerekli.</string>
+    <string name="error_at_least_one_line">En az bir kalem eklemelisin.</string>
+    <string name="error_select_product">Her satır için bir ürün seç.</string>
+    <string name="error_order_save_failed">Sipariş kaydedilemedi.</string>
+    <string name="screen_order_detail">Sipariş detayı</string>
+    <string name="status_draft">Taslak</string>
+    <string name="status_approved">Onaylandı</string>
+    <string name="action_approve_order">Onayla</string>
+    <string name="confirm_approve_order">Bu siparişi onaylamak istediğine emin misin? Stoklar hemen güncellenir ve sipariş kilitlenir.</string>
+    <string name="confirm_delete_order">Bu taslak siparişi silmek istediğine emin misin?</string>
+    <string name="order_not_found">Bu sipariş artık mevcut değil.</string>
 </resources>

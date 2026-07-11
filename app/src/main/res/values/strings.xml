@@ -12,6 +12,7 @@
 
     <string name="tab_dashboard">Dashboard</string>
     <string name="tab_products">Products</string>
+    <string name="tab_orders">Orders</string>
     <string name="tab_alerts">Alerts</string>
     <string name="tab_settings">Settings</string>
 
@@ -33,6 +34,7 @@
     <string name="placeholder_coming_soon">This screen is coming soon.</string>
 
     <string name="field_product_name">Product name</string>
+    <string name="field_product">Product</string>
     <string name="field_sku">SKU</string>
     <string name="field_quantity">Quantity</string>
     <string name="field_reorder_point">Reorder point</string>
@@ -78,10 +80,31 @@
     <string name="action_grant_permission">Grant permission</string>
     <string name="product_not_found_by_barcode">No product matches this barcode yet.</string>
     <string name="action_add_product_with_barcode">Add a new product with this barcode</string>
-    <string name="quantity_edit_hint">Current quantity: %1$s. Use Stock in / Stock out on the product detail screen to change it.</string>
+    <string name="quantity_edit_hint">Current quantity: %1$s. Use a purchase or sales order to change it.</string>
 
     <string name="field_language">Language</string>
     <string name="language_system">System default</string>
     <string name="language_turkish">Turkish</string>
     <string name="language_english">English</string>
+
+    <string name="order_tab_purchase">Purchase</string>
+    <string name="order_tab_sale">Sale</string>
+    <string name="orders_empty">No orders yet. Tap + to create one.</string>
+    <string name="field_order_number">Order / invoice number</string>
+    <string name="screen_create_purchase_order">New purchase order</string>
+    <string name="screen_create_sale_order">New sales order</string>
+    <string name="field_order_lines">Line items</string>
+    <string name="action_add_line">+ Add line</string>
+    <string name="action_remove_line">Remove line</string>
+    <string name="error_order_number_required">Order number is required.</string>
+    <string name="error_at_least_one_line">Add at least one line item.</string>
+    <string name="error_select_product">Select a product for every line.</string>
+    <string name="error_order_save_failed">Could not save the order.</string>
+    <string name="screen_order_detail">Order detail</string>
+    <string name="status_draft">Draft</string>
+    <string name="status_approved">Approved</string>
+    <string name="action_approve_order">Approve</string>
+    <string name="confirm_approve_order">Approve this order? Stock will update immediately and the order will be locked.</string>
+    <string name="confirm_delete_order">Delete this draft order?</string>
+    <string name="order_not_found">This order no longer exists.</string>
 </resources>

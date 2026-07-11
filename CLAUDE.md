@@ -1,18 +1,26 @@
 # CLAUDE.md — StockGuard+
 
 **Status: Auth + Firestore wired, core loop works.** Sign up (email/password,
-creates an org), sign in, sign out, Dashboard, Product list, Add product,
-Category management (add/rename/delete, with delete reassigning affected
-products to "Uncategorized"), Product detail, Company management ("Firmalar"
-— add/delete), and stock in/out movements are all backed by real Firestore
-data — verified end to end 2026-07-11. Stock is no longer edited directly:
-every quantity change goes through a "Stok Girişi" (in) or "Stok Çıkışı"
-(out) action tied to a required company (supplier or customer, no
-distinction), recorded atomically with the product's quantity via a Firestore
-transaction, with an in-app movement history per product. Edit product,
-low-stock alerts list, and barcode scanning are still placeholder screens.
-Google Sign-In is declared in the stack but not implemented yet (needs a
-SHA-1 fingerprint added in the Firebase console first).
+creates an org), sign in, sign out, Dashboard, Product list, Add/edit
+product, Category management, Product detail (with movement history),
+Company management ("Firmalar"), barcode scanning, and Purchase/Sales orders
+are all backed by real Firestore data — verified end to end 2026-07-11.
+**Stock quantity is never edited directly or one product at a time** — it
+only changes when a multi-line Purchase Order (stock in, from a company) or
+Sales Order (stock out, to a company) is approved. An order is created as a
+`draft` (order/invoice number, one company, one or more product+quantity
+lines) and is immutable after creation — wrong orders get deleted and
+re-entered, not edited. Approving a draft is one Firestore transaction that
+updates every line's product quantity and writes a `Movement` record per
+line (rejecting the whole approval if any Sales Order line would take a
+product below zero), so per-product movement history and order-level
+approval can never drift apart. This replaced an earlier single-product
+"Stok Girişi/Çıkışı" design that didn't match how deliveries and invoices
+actually arrive (multiple line items at once) — see "Data model" below.
+Low-stock alerts list (reachable from the Dashboard's "Low stock" stat card,
+not its own bottom tab) is still a placeholder screen. Google Sign-In is
+declared in the stack but not implemented yet (needs a SHA-1 fingerprint
+added in the Firebase console first).
 
 ## What this is
 
@@ -51,29 +59,42 @@ because v1 has no team invites yet. When employee accounts are built (see
 Roadmap), this needs a real `uid -> orgId` lookup and `firestore.rules` (repo
 root) needs updating to match — right now its `orgId == request.auth.uid`
 check would block any invited employee.
-- `organizations/{orgId}/products/{productId}` — name, sku, quantity,
-  reorderPoint, categoryId. `categoryId` is a real reference into
+- `organizations/{orgId}/products/{productId}` — name, sku, barcode,
+  quantity, reorderPoint, categoryId. `categoryId` is a real reference into
   `categories` (empty string = uncategorized); deleting a category reassigns
   its products to `categoryId = ""` via a batch write in
   `FirebaseCategoryRepository.deleteCategory`. `quantity` lives directly on
   the product doc (v1 simplification — no separate per-location `stock`
   collection yet; see multi-location note below) and is only ever changed
-  via `FirebaseMovementRepository.recordMovement`, never written directly.
+  by `FirebaseOrderRepository.approveOrder`, never written directly or from
+  a per-product screen.
 - `organizations/{orgId}/categories/{categoryId}` — name, sortOrder
 - `organizations/{orgId}/parties/{partyId}` — name, address, phone1, phone2,
   email. A flat list of companies — supplier or customer, no type
   distinction (matches how small businesses actually use one contact list
-  for both). Selected on every stock movement; required, not optional.
+  for both). Selected on every order; required, not optional.
+- `organizations/{orgId}/orders/{orderId}` — orderNumber (free text, the
+  supplier/customer's own invoice or PO number — not auto-generated), type
+  (`purchase`/`sale`), partyId (required reference into `parties`), status
+  (`draft`/`approved`), lines (embedded array of `{productId, quantity}` —
+  not a subcollection, since an order is always read/written as one atomic
+  unit), userId, createdAt, approvedAt. Created as `draft` with all its
+  lines in one write via `FirebaseOrderRepository.createOrder`; drafts are
+  **not editable** — a wrong draft is deleted and re-created, not patched.
+  `FirebaseOrderRepository.approveOrder` runs one Firestore transaction that,
+  for every line, updates that product's `quantity` (add for `purchase`,
+  subtract for `sale`) and writes a matching `Movement` doc, then flips the
+  order to `approved`; a `sale` line that would take a product below zero
+  throws `InsufficientStockException` and aborts the *entire* order (no
+  partial approval). Once `approved`, an order is immutable.
 - `organizations/{orgId}/movements/{movementId}` — productId, type
-  (`in`/`out`), quantity, partyId (required reference into `parties`),
-  userId, timestamp (server timestamp). Written together with the product's
-  `quantity` update inside one Firestore transaction in
-  `FirebaseMovementRepository.recordMovement`, so the two can never drift.
-  `out` movements are rejected in the transaction if `quantity` exceeds
-  current stock (throws `InsufficientStockException`) — stock never goes
-  negative. Movement history per product is fetched by `productId` only and
-  sorted client-side (avoids needing a Firestore composite index for a
-  `productId` + `timestamp` query).
+  (`in`/`out`), quantity, partyId, orderId (which order produced this line),
+  userId, timestamp (server timestamp). Write-only from
+  `FirebaseOrderRepository.approveOrder` (one per approved order line) —
+  there is no path that writes a movement outside of order approval.
+  Movement history per product is fetched by `productId` only and sorted
+  client-side (avoids needing a Firestore composite index for a `productId`
+  + `timestamp` query).
 - `organizations/{orgId}/locations/{locationId}` — not implemented yet
   (planned for multi-warehouse, see Roadmap); `quantity` above assumes a
   single implicit location until that lands.
@@ -111,18 +132,25 @@ a column.
 1. Onboarding + sign-in (email/password + Google) with language picker
 2. Dashboard — total products, low-stock count, out-of-stock count
 3. Product list — search, category filter, stock-status badge
-4. Product detail — done: stock movement history, stock in/out (barcode
-   entry point still pending, see item 7)
-5. Add/edit product — add done, edit still a placeholder screen
+4. Product detail — done: read-only quantity + per-product movement history.
+   No in/out actions here — see item 7.
+5. Add/edit product — both done; barcode field + scan-to-fill done; editing
+   never touches quantity (see item 7)
 6. Category management (inside Settings: add/rename/delete — deleting
    reassigns affected products to "Uncategorized", no blocking dialog)
 6b. Company management (inside Settings, "Firmalar": add/delete — no
-    rename yet). Required on every stock in/out movement.
-7. Quick stock in/out via barcode scan — in/out flow (with required company
-   + movement history) done; barcode-scan entry point not built yet, still
-   manual quantity entry
-8. Low-stock alerts (in-app list + push notification)
-9. Settings — language, subscription status, account
+    rename yet). Required on every order.
+7. Purchase Orders / Sales Orders (bottom tab "Orders", two sub-tabs) — done.
+   Multi-line orders against a company, created as an immutable draft then
+   approved (approval is the only way stock quantity changes — see "Data
+   model"). Barcode scan on the product list jumps straight to a matched
+   product's detail screen, or offers to create a new product with that
+   barcode if nothing matches.
+8. Low-stock alerts — in-app list still a placeholder screen (reachable from
+   the Dashboard's "Low stock" stat card); push notification not started.
+9. Settings — language picker (EN/TR, in-app override independent of device
+   locale) done; subscription status still pending (no billing yet, see
+   Roadmap)
 
 Explicitly **out of scope for v1** — see Roadmap below. Don't build these
 unless asked, even if they seem like a natural extension of a screen above.

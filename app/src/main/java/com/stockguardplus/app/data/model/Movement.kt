@@ -14,6 +14,7 @@ data class Movement(
     val type: String = "",
     val quantity: Int = 0,
     val partyId: String = "",
+    val orderId: String = "",
     val userId: String = "",
     @ServerTimestamp val timestamp: Timestamp? = null
 ) {

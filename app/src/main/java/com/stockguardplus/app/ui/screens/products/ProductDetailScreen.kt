@@ -15,8 +15,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -60,18 +58,11 @@ fun ProductDetailScreen(
     val companies by viewModel.companies.collectAsState()
     val movements by viewModel.movements.collectAsState()
     val isDeleted by viewModel.isDeleted.collectAsState()
-    val movementError by viewModel.movementError.collectAsState()
-    val movementInProgress by viewModel.movementInProgress.collectAsState()
-    val movementCompletedSignal by viewModel.movementCompletedSignal.collectAsState()
 
     var showDeleteDialog by remember { mutableStateOf(false) }
-    var movementDialogType by remember { mutableStateOf<MovementType?>(null) }
 
     LaunchedEffect(isDeleted) {
         if (isDeleted) onDeleted()
-    }
-    LaunchedEffect(movementCompletedSignal) {
-        if (movementCompletedSignal > 0) movementDialogType = null
     }
 
     val uncategorizedLabel = stringResource(R.string.category_uncategorized)
@@ -129,28 +120,6 @@ fun ProductDetailScreen(
                 item { DetailField(labelRes = R.string.field_quantity, value = current.quantity.toString()) }
 
                 item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Button(
-                            onClick = { movementDialogType = MovementType.IN },
-                            colors = ButtonDefaults.buttonColors(containerColor = StockGood),
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Text(stringResource(R.string.action_stock_in))
-                        }
-                        Button(
-                            onClick = { movementDialogType = MovementType.OUT },
-                            colors = ButtonDefaults.buttonColors(containerColor = StockBad),
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Text(stringResource(R.string.action_stock_out))
-                        }
-                    }
-                }
-
-                item {
                     Text(
                         text = stringResource(R.string.stock_movements_title),
                         style = MaterialTheme.typography.titleSmall,
@@ -176,25 +145,6 @@ fun ProductDetailScreen(
                 }
             }
         }
-    }
-
-    movementDialogType?.let { type ->
-        StockMovementDialog(
-            type = type,
-            companies = companies,
-            errorMessage = movementError,
-            inProgress = movementInProgress,
-            onDismiss = {
-                viewModel.clearMovementError()
-                movementDialogType = null
-            },
-            onAddCompany = { name, address, phone1, phone2, email ->
-                viewModel.addCompany(name, address, phone1, phone2, email)
-            },
-            onConfirm = { quantity, partyId ->
-                viewModel.recordMovement(type, quantity, partyId)
-            }
-        )
     }
 
     if (showDeleteDialog) {

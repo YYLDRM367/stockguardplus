@@ -1,5 +1,6 @@
 package com.stockguardplus.app.ui.navigation
 
+import com.stockguardplus.app.data.model.OrderType
 import java.net.URLDecoder
 import java.net.URLEncoder
 
@@ -12,8 +13,17 @@ sealed class Screen(val route: String) {
     data object Products : Screen("products")
     data object Categories : Screen("categories")
     data object Companies : Screen("companies")
+    data object Orders : Screen("orders")
     data object Alerts : Screen("alerts")
     data object Settings : Screen("settings")
+
+    data object CreateOrder : Screen("orders/create/{type}") {
+        fun createRoute(type: OrderType) = "orders/create/${type.value}"
+    }
+
+    data object OrderDetail : Screen("orders/{orderId}") {
+        fun createRoute(orderId: String) = "orders/${encode(orderId)}"
+    }
 
     data object ProductDetail : Screen("products/{productId}") {
         fun createRoute(productId: String) = "products/$productId"

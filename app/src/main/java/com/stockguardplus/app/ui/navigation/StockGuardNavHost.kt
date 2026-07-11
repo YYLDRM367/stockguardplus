@@ -1,10 +1,10 @@
 package com.stockguardplus.app.ui.navigation
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Assignment
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.Inventory2
-import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -28,11 +28,15 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.stockguardplus.app.R
+import com.stockguardplus.app.data.model.OrderType
 import com.stockguardplus.app.ui.screens.alerts.LowStockAlertsScreen
 import com.stockguardplus.app.ui.screens.categories.CategoriesScreen
 import com.stockguardplus.app.ui.screens.companies.CompaniesScreen
 import com.stockguardplus.app.ui.screens.dashboard.DashboardScreen
 import com.stockguardplus.app.ui.screens.onboarding.OnboardingScreen
+import com.stockguardplus.app.ui.screens.orders.CreateOrderScreen
+import com.stockguardplus.app.ui.screens.orders.OrderDetailScreen
+import com.stockguardplus.app.ui.screens.orders.OrdersScreen
 import com.stockguardplus.app.ui.screens.products.AddEditProductScreen
 import com.stockguardplus.app.ui.screens.products.ProductDetailScreen
 import com.stockguardplus.app.ui.screens.products.ProductListScreen
@@ -45,7 +49,7 @@ private data class BottomTab(val screen: Screen, val icon: ImageVector, val labe
 private val bottomTabs = listOf(
     BottomTab(Screen.Dashboard, Icons.Filled.Dashboard, R.string.tab_dashboard),
     BottomTab(Screen.Products, Icons.Filled.Inventory2, R.string.tab_products),
-    BottomTab(Screen.Alerts, Icons.Filled.NotificationsActive, R.string.tab_alerts),
+    BottomTab(Screen.Orders, Icons.AutoMirrored.Filled.Assignment, R.string.tab_orders),
     BottomTab(Screen.Settings, Icons.Filled.Settings, R.string.tab_settings)
 )
 
@@ -97,7 +101,9 @@ fun StockGuardNavHost(navStartViewModel: NavStartViewModel = hiltViewModel()) {
                 )
             }
             composable(Screen.Dashboard.route) {
-                DashboardScreen()
+                DashboardScreen(
+                    onLowStockClick = { navController.navigate(Screen.Alerts.route) }
+                )
             }
             composable(Screen.Products.route) {
                 ProductListScreen(
@@ -185,6 +191,32 @@ fun StockGuardNavHost(navStartViewModel: NavStartViewModel = hiltViewModel()) {
                         }
                     },
                     onCancel = { navController.popBackStack() }
+                )
+            }
+            composable(Screen.Orders.route) {
+                OrdersScreen(
+                    onCreateOrder = { type -> navController.navigate(Screen.CreateOrder.createRoute(type)) },
+                    onOrderClick = { id -> navController.navigate(Screen.OrderDetail.createRoute(id)) }
+                )
+            }
+            composable(
+                route = Screen.CreateOrder.route,
+                arguments = listOf(navArgument("type") { type = NavType.StringType })
+            ) { entry ->
+                val orderType = OrderType.fromValue(entry.arguments?.getString("type") ?: OrderType.PURCHASE.value)
+                CreateOrderScreen(
+                    type = orderType,
+                    onSaved = { navController.popBackStack() }
+                )
+            }
+            composable(
+                route = Screen.OrderDetail.route,
+                arguments = listOf(navArgument("orderId") { type = NavType.StringType })
+            ) { entry ->
+                val orderId = decodeRouteParam(entry.arguments?.getString("orderId").orEmpty())
+                OrderDetailScreen(
+                    orderId = orderId,
+                    onDeleted = { navController.popBackStack() }
                 )
             }
             composable(Screen.Categories.route) {

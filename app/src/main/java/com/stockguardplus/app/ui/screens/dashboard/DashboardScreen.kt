@@ -1,5 +1,6 @@
 package com.stockguardplus.app.ui.screens.dashboard
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,7 +23,7 @@ import com.stockguardplus.app.ui.theme.StockBad
 import com.stockguardplus.app.ui.theme.StockWarn
 
 @Composable
-fun DashboardScreen(viewModel: DashboardViewModel = hiltViewModel()) {
+fun DashboardScreen(onLowStockClick: () -> Unit, viewModel: DashboardViewModel = hiltViewModel()) {
     val products by viewModel.products.collectAsState()
     val lowStockCount = products.count { it.status == StockStatus.LOW_STOCK }
     val outOfStockCount = products.count { it.status == StockStatus.OUT_OF_STOCK }
@@ -48,7 +49,7 @@ fun DashboardScreen(viewModel: DashboardViewModel = hiltViewModel()) {
                     value = lowStockCount.toString(),
                     label = stringResource(R.string.stat_low_stock),
                     valueColor = StockWarn,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f).clickable(onClick = onLowStockClick)
                 )
                 StatCard(
                     value = outOfStockCount.toString(),

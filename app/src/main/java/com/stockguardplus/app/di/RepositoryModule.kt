@@ -7,8 +7,10 @@ import com.stockguardplus.app.data.repository.FirebaseAuthRepository
 import com.stockguardplus.app.data.repository.FirebaseCategoryRepository
 import com.stockguardplus.app.data.repository.FirebaseCompanyRepository
 import com.stockguardplus.app.data.repository.FirebaseMovementRepository
+import com.stockguardplus.app.data.repository.FirebaseOrderRepository
 import com.stockguardplus.app.data.repository.FirebaseProductRepository
 import com.stockguardplus.app.data.repository.MovementRepository
+import com.stockguardplus.app.data.repository.OrderRepository
 import com.stockguardplus.app.data.repository.ProductRepository
 import dagger.Binds
 import dagger.Module
@@ -39,4 +41,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindMovementRepository(impl: FirebaseMovementRepository): MovementRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindOrderRepository(impl: FirebaseOrderRepository): OrderRepository
 }
