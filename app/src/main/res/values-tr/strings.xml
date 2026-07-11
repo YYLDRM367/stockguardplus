@@ -44,8 +44,44 @@
     <string name="field_new_category_name">Yeni kategori adı</string>
     <string name="action_add">Ekle</string>
     <string name="action_rename">Yeniden adlandır</string>
+    <string name="action_edit">Düzenle</string>
     <string name="action_delete">Sil</string>
     <string name="action_cancel">İptal</string>
     <string name="category_uncategorized">Kategorisiz</string>
     <string name="action_add_category">+ Yeni kategori ekle</string>
+
+    <string name="confirm_delete_product">Bu ürünü silmek istediğine emin misin? Bu işlem geri alınamaz.</string>
+    <string name="product_not_found">Bu ürün artık mevcut değil.</string>
+
+    <string name="screen_companies">Firmalar</string>
+    <string name="companies_empty">Henüz firma yok. Eklemek için + simgesine dokun.</string>
+    <string name="field_company_name">Firma adı</string>
+    <string name="field_address">Adres</string>
+    <string name="field_phone1">Telefon 1</string>
+    <string name="field_phone2">Telefon 2</string>
+    <string name="field_email">E-posta</string>
+    <string name="action_add_company">+ Yeni firma ekle</string>
+    <string name="field_company">Firma</string>
+    <string name="company_none">Firma seç</string>
+    <string name="action_stock_in">Stok girişi</string>
+    <string name="action_stock_out">Stok çıkışı</string>
+    <string name="error_select_company">Lütfen bir firma seç.</string>
+    <string name="error_enter_quantity">Lütfen geçerli bir miktar gir.</string>
+    <string name="stock_movements_title">Stok hareketleri</string>
+    <string name="movements_empty">Henüz hareket yok.</string>
+    <string name="movement_type_in">Giriş</string>
+    <string name="movement_type_out">Çıkış</string>
+
+    <string name="field_barcode">Barkod</string>
+    <string name="action_scan_barcode">Barkod tara</string>
+    <string name="camera_permission_rationale">Barkod taramak için kamera izni gerekiyor.</string>
+    <string name="action_grant_permission">İzin ver</string>
+    <string name="product_not_found_by_barcode">Bu barkoda ait bir ürün bulunamadı.</string>
+    <string name="action_add_product_with_barcode">Bu barkodla yeni ürün ekle</string>
+    <string name="quantity_edit_hint">Mevcut miktar: %1$s. Değiştirmek için ürün detayındaki Stok Girişi / Çıkışı\'nı kullan.</string>
+
+    <string name="field_language">Dil</string>
+    <string name="language_system">Sistem varsayılanı</string>
+    <string name="language_turkish">Türkçe</string>
+    <string name="language_english">İngilizce</string>
 </resources>

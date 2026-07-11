@@ -8,12 +8,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -33,25 +37,31 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.stockguardplus.app.R
-import com.stockguardplus.app.ui.components.PlaceholderScreen
+import com.stockguardplus.app.ui.theme.PaperMuted
 import com.stockguardplus.app.ui.theme.StockBad
 
 @Composable
 fun AddEditProductScreen(
     productId: String?,
+    initialBarcode: String? = null,
+    scannedBarcode: String? = null,
+    onScanBarcode: () -> Unit = {},
     onSaved: () -> Unit,
     viewModel: AddEditProductViewModel = hiltViewModel()
 ) {
-    if (productId != null) {
-        // Editing an existing product isn't wired up yet — only "add" is functional so far.
-        PlaceholderScreen(titleRes = R.string.screen_edit_product)
-        return
-    }
-
     val uiState by viewModel.uiState.collectAsState()
     val categories by viewModel.categories.collectAsState()
     var categoryMenuExpanded by remember { mutableStateOf(false) }
     var showAddCategoryDialog by remember { mutableStateOf(false) }
+
+    LaunchedEffect(productId) { viewModel.load(productId) }
+
+    LaunchedEffect(Unit) {
+        if (!initialBarcode.isNullOrBlank()) viewModel.onBarcodeChange(initialBarcode)
+    }
+    LaunchedEffect(scannedBarcode) {
+        if (!scannedBarcode.isNullOrBlank()) viewModel.onBarcodeChange(scannedBarcode)
+    }
 
     LaunchedEffect(uiState.isSaved) {
         if (uiState.isSaved) onSaved()
@@ -61,7 +71,17 @@ fun AddEditProductScreen(
     val selectedCategoryName = categories.find { it.id == uiState.categoryId }?.name ?: uncategorizedLabel
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text(stringResource(R.string.screen_add_product)) }) }
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        stringResource(
+                            if (uiState.isEditing) R.string.screen_edit_product else R.string.screen_add_product
+                        )
+                    )
+                }
+            )
+        }
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -86,13 +106,33 @@ fun AddEditProductScreen(
                 modifier = Modifier.fillMaxWidth()
             )
             OutlinedTextField(
-                value = uiState.quantity,
-                onValueChange = viewModel::onQuantityChange,
-                label = { Text(stringResource(R.string.field_quantity)) },
+                value = uiState.barcode,
+                onValueChange = viewModel::onBarcodeChange,
+                label = { Text(stringResource(R.string.field_barcode)) },
                 singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                trailingIcon = {
+                    IconButton(onClick = onScanBarcode) {
+                        Icon(Icons.Filled.QrCodeScanner, contentDescription = stringResource(R.string.action_scan_barcode))
+                    }
+                },
                 modifier = Modifier.fillMaxWidth()
             )
+            if (uiState.isEditing) {
+                Text(
+                    text = stringResource(R.string.quantity_edit_hint, uiState.quantity),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = PaperMuted
+                )
+            } else {
+                OutlinedTextField(
+                    value = uiState.quantity,
+                    onValueChange = viewModel::onQuantityChange,
+                    label = { Text(stringResource(R.string.field_quantity)) },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
             OutlinedTextField(
                 value = uiState.reorderPoint,
                 onValueChange = viewModel::onReorderPointChange,

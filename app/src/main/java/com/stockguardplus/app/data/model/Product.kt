@@ -6,6 +6,7 @@ data class Product(
     @DocumentId val id: String = "",
     val name: String = "",
     val sku: String = "",
+    val barcode: String = "",
     val quantity: Int = 0,
     val reorderPoint: Int = 0,
     val categoryId: String = ""

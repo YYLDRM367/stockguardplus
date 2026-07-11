@@ -44,8 +44,44 @@
     <string name="field_new_category_name">New category name</string>
     <string name="action_add">Add</string>
     <string name="action_rename">Rename</string>
+    <string name="action_edit">Edit</string>
     <string name="action_delete">Delete</string>
     <string name="action_cancel">Cancel</string>
     <string name="category_uncategorized">Uncategorized</string>
     <string name="action_add_category">+ Add new category</string>
+
+    <string name="confirm_delete_product">Delete this product? This can\'t be undone.</string>
+    <string name="product_not_found">This product no longer exists.</string>
+
+    <string name="screen_companies">Companies</string>
+    <string name="companies_empty">No companies yet. Tap + to add one.</string>
+    <string name="field_company_name">Company name</string>
+    <string name="field_address">Address</string>
+    <string name="field_phone1">Phone 1</string>
+    <string name="field_phone2">Phone 2</string>
+    <string name="field_email">Email</string>
+    <string name="action_add_company">+ Add new company</string>
+    <string name="field_company">Company</string>
+    <string name="company_none">Select a company</string>
+    <string name="action_stock_in">Stock in</string>
+    <string name="action_stock_out">Stock out</string>
+    <string name="error_select_company">Please select a company.</string>
+    <string name="error_enter_quantity">Please enter a valid quantity.</string>
+    <string name="stock_movements_title">Stock movements</string>
+    <string name="movements_empty">No movements yet.</string>
+    <string name="movement_type_in">In</string>
+    <string name="movement_type_out">Out</string>
+
+    <string name="field_barcode">Barcode</string>
+    <string name="action_scan_barcode">Scan barcode</string>
+    <string name="camera_permission_rationale">Camera access is needed to scan a barcode.</string>
+    <string name="action_grant_permission">Grant permission</string>
+    <string name="product_not_found_by_barcode">No product matches this barcode yet.</string>
+    <string name="action_add_product_with_barcode">Add a new product with this barcode</string>
+    <string name="quantity_edit_hint">Current quantity: %1$s. Use Stock in / Stock out on the product detail screen to change it.</string>
+
+    <string name="field_language">Language</string>
+    <string name="language_system">System default</string>
+    <string name="language_turkish">Turkish</string>
+    <string name="language_english">English</string>
 </resources>

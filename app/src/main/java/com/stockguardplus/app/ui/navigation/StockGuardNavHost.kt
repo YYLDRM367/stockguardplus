@@ -13,6 +13,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -29,11 +30,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.stockguardplus.app.R
 import com.stockguardplus.app.ui.screens.alerts.LowStockAlertsScreen
 import com.stockguardplus.app.ui.screens.categories.CategoriesScreen
+import com.stockguardplus.app.ui.screens.companies.CompaniesScreen
 import com.stockguardplus.app.ui.screens.dashboard.DashboardScreen
 import com.stockguardplus.app.ui.screens.onboarding.OnboardingScreen
 import com.stockguardplus.app.ui.screens.products.AddEditProductScreen
 import com.stockguardplus.app.ui.screens.products.ProductDetailScreen
 import com.stockguardplus.app.ui.screens.products.ProductListScreen
+import com.stockguardplus.app.ui.screens.scanner.BarcodeLookupScreen
+import com.stockguardplus.app.ui.screens.scanner.BarcodeScannerScreen
 import com.stockguardplus.app.ui.screens.settings.SettingsScreen
 
 private data class BottomTab(val screen: Screen, val icon: ImageVector, val labelRes: Int)
@@ -98,7 +102,8 @@ fun StockGuardNavHost(navStartViewModel: NavStartViewModel = hiltViewModel()) {
             composable(Screen.Products.route) {
                 ProductListScreen(
                     onProductClick = { id -> navController.navigate(Screen.ProductDetail.createRoute(id)) },
-                    onAddProduct = { navController.navigate(Screen.AddEditProduct.createRoute()) }
+                    onAddProduct = { navController.navigate(Screen.AddEditProduct.createRoute()) },
+                    onScanBarcode = { navController.navigate(Screen.ScanBarcode.createRoute(ScanMode.LOOKUP)) }
                 )
             }
             composable(
@@ -106,7 +111,11 @@ fun StockGuardNavHost(navStartViewModel: NavStartViewModel = hiltViewModel()) {
                 arguments = listOf(navArgument("productId") { type = NavType.StringType })
             ) { entry ->
                 val productId = entry.arguments?.getString("productId").orEmpty()
-                ProductDetailScreen(productId = productId)
+                ProductDetailScreen(
+                    productId = productId,
+                    onDeleted = { navController.popBackStack() },
+                    onEdit = { id -> navController.navigate(Screen.AddEditProduct.createRoute(productId = id)) }
+                )
             }
             composable(
                 route = Screen.AddEditProduct.route,
@@ -114,14 +123,75 @@ fun StockGuardNavHost(navStartViewModel: NavStartViewModel = hiltViewModel()) {
                     navArgument("productId") {
                         type = NavType.StringType
                         nullable = true
+                    },
+                    navArgument("barcode") {
+                        type = NavType.StringType
+                        nullable = true
                     }
                 )
             ) { entry ->
                 val productId = entry.arguments?.getString("productId")
-                AddEditProductScreen(productId = productId, onSaved = { navController.popBackStack() })
+                val initialBarcode = entry.arguments?.getString("barcode")?.let { decodeRouteParam(it) }
+                val scannedBarcode by entry.savedStateHandle
+                    .getStateFlow<String?>("scanned_barcode", null)
+                    .collectAsState()
+                AddEditProductScreen(
+                    productId = productId,
+                    initialBarcode = initialBarcode,
+                    scannedBarcode = scannedBarcode,
+                    onScanBarcode = { navController.navigate(Screen.ScanBarcode.createRoute(ScanMode.FIELD)) },
+                    onSaved = { navController.popBackStack() }
+                )
+            }
+            composable(
+                route = Screen.ScanBarcode.route,
+                arguments = listOf(navArgument("mode") { type = NavType.StringType })
+            ) { entry ->
+                val mode = ScanMode.fromValue(entry.arguments?.getString("mode"))
+                BarcodeScannerScreen(
+                    onBarcodeScanned = { value ->
+                        when (mode) {
+                            ScanMode.FIELD -> {
+                                navController.previousBackStackEntry
+                                    ?.savedStateHandle
+                                    ?.set("scanned_barcode", value)
+                                navController.popBackStack()
+                            }
+                            ScanMode.LOOKUP -> {
+                                navController.navigate(Screen.BarcodeLookup.createRoute(value)) {
+                                    popUpTo(Screen.Products.route)
+                                }
+                            }
+                        }
+                    },
+                    onCancel = { navController.popBackStack() }
+                )
+            }
+            composable(
+                route = Screen.BarcodeLookup.route,
+                arguments = listOf(navArgument("barcode") { type = NavType.StringType })
+            ) { entry ->
+                val barcode = decodeRouteParam(entry.arguments?.getString("barcode").orEmpty())
+                BarcodeLookupScreen(
+                    barcode = barcode,
+                    onFound = { productId ->
+                        navController.navigate(Screen.ProductDetail.createRoute(productId)) {
+                            popUpTo(Screen.Products.route)
+                        }
+                    },
+                    onAddProductWithBarcode = { code ->
+                        navController.navigate(Screen.AddEditProduct.createRoute(barcode = code)) {
+                            popUpTo(Screen.Products.route)
+                        }
+                    },
+                    onCancel = { navController.popBackStack() }
+                )
             }
             composable(Screen.Categories.route) {
                 CategoriesScreen()
+            }
+            composable(Screen.Companies.route) {
+                CompaniesScreen()
             }
             composable(Screen.Alerts.route) {
                 LowStockAlertsScreen()
@@ -129,6 +199,7 @@ fun StockGuardNavHost(navStartViewModel: NavStartViewModel = hiltViewModel()) {
             composable(Screen.Settings.route) {
                 SettingsScreen(
                     onManageCategories = { navController.navigate(Screen.Categories.route) },
+                    onManageCompanies = { navController.navigate(Screen.Companies.route) },
                     onSignedOut = {
                         navController.navigate(Screen.Onboarding.route) {
                             popUpTo(navController.graph.id) { inclusive = true }

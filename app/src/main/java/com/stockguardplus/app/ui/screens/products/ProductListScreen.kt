@@ -14,8 +14,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -39,12 +41,22 @@ import com.stockguardplus.app.ui.theme.PaperSurface
 fun ProductListScreen(
     onProductClick: (String) -> Unit,
     onAddProduct: () -> Unit,
+    onScanBarcode: () -> Unit,
     viewModel: ProductListViewModel = hiltViewModel()
 ) {
     val products by viewModel.products.collectAsState()
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text(stringResource(R.string.tab_products)) }) },
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.tab_products)) },
+                actions = {
+                    IconButton(onClick = onScanBarcode) {
+                        Icon(Icons.Filled.QrCodeScanner, contentDescription = stringResource(R.string.action_scan_barcode))
+                    }
+                }
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(onClick = onAddProduct) {
                 Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.action_add_product))

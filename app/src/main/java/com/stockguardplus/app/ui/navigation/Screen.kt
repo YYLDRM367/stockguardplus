@@ -1,10 +1,17 @@
 package com.stockguardplus.app.ui.navigation
 
+import java.net.URLDecoder
+import java.net.URLEncoder
+
+private fun encode(value: String) = URLEncoder.encode(value, "UTF-8")
+fun decodeRouteParam(value: String) = URLDecoder.decode(value, "UTF-8")
+
 sealed class Screen(val route: String) {
     data object Onboarding : Screen("onboarding")
     data object Dashboard : Screen("dashboard")
     data object Products : Screen("products")
     data object Categories : Screen("categories")
+    data object Companies : Screen("companies")
     data object Alerts : Screen("alerts")
     data object Settings : Screen("settings")
 
@@ -12,8 +19,29 @@ sealed class Screen(val route: String) {
         fun createRoute(productId: String) = "products/$productId"
     }
 
-    data object AddEditProduct : Screen("products/edit?productId={productId}") {
-        fun createRoute(productId: String? = null) =
-            if (productId != null) "products/edit?productId=$productId" else "products/edit"
+    data object AddEditProduct : Screen("products/edit?productId={productId}&barcode={barcode}") {
+        fun createRoute(productId: String? = null, barcode: String? = null): String {
+            val params = mutableListOf<String>()
+            if (productId != null) params += "productId=${encode(productId)}"
+            if (barcode != null) params += "barcode=${encode(barcode)}"
+            return if (params.isEmpty()) "products/edit" else "products/edit?${params.joinToString("&")}"
+        }
+    }
+
+    data object ScanBarcode : Screen("scan/{mode}") {
+        fun createRoute(mode: ScanMode) = "scan/${mode.value}"
+    }
+
+    data object BarcodeLookup : Screen("scan/lookup-result/{barcode}") {
+        fun createRoute(barcode: String) = "scan/lookup-result/${encode(barcode)}"
+    }
+}
+
+enum class ScanMode(val value: String) {
+    FIELD("field"),
+    LOOKUP("lookup");
+
+    companion object {
+        fun fromValue(value: String?) = entries.find { it.value == value } ?: FIELD
     }
 }
