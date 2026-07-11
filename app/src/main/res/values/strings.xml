@@ -16,6 +16,7 @@
     <string name="tab_alerts">Alerts</string>
     <string name="tab_settings">Settings</string>
 
+    <string name="alerts_empty">No low-stock or out-of-stock products right now.</string>
     <string name="stat_total_products">Products</string>
     <string name="stat_low_stock">Low stock</string>
     <string name="stat_out_of_stock">Out of stock</string>

@@ -16,6 +16,7 @@
     <string name="tab_alerts">Uyarılar</string>
     <string name="tab_settings">Ayarlar</string>
 
+    <string name="alerts_empty">Şu an az stoklu ya da tükenmiş ürün yok.</string>
     <string name="stat_total_products">Ürün</string>
     <string name="stat_low_stock">Az Stok</string>
     <string name="stat_out_of_stock">Tükendi</string>

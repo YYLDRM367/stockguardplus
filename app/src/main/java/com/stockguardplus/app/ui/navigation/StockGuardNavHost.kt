@@ -102,7 +102,14 @@ fun StockGuardNavHost(navStartViewModel: NavStartViewModel = hiltViewModel()) {
             }
             composable(Screen.Dashboard.route) {
                 DashboardScreen(
-                    onLowStockClick = { navController.navigate(Screen.Alerts.route) }
+                    onProductsClick = {
+                        navController.navigate(Screen.Products.route) {
+                            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                    onAlertsClick = { navController.navigate(Screen.Alerts.route) }
                 )
             }
             composable(Screen.Products.route) {
@@ -226,7 +233,9 @@ fun StockGuardNavHost(navStartViewModel: NavStartViewModel = hiltViewModel()) {
                 CompaniesScreen()
             }
             composable(Screen.Alerts.route) {
-                LowStockAlertsScreen()
+                LowStockAlertsScreen(
+                    onProductClick = { id -> navController.navigate(Screen.ProductDetail.createRoute(id)) }
+                )
             }
             composable(Screen.Settings.route) {
                 SettingsScreen(

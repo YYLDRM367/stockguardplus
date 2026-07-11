@@ -23,7 +23,11 @@ import com.stockguardplus.app.ui.theme.StockBad
 import com.stockguardplus.app.ui.theme.StockWarn
 
 @Composable
-fun DashboardScreen(onLowStockClick: () -> Unit, viewModel: DashboardViewModel = hiltViewModel()) {
+fun DashboardScreen(
+    onProductsClick: () -> Unit,
+    onAlertsClick: () -> Unit,
+    viewModel: DashboardViewModel = hiltViewModel()
+) {
     val products by viewModel.products.collectAsState()
     val lowStockCount = products.count { it.status == StockStatus.LOW_STOCK }
     val outOfStockCount = products.count { it.status == StockStatus.OUT_OF_STOCK }
@@ -43,19 +47,19 @@ fun DashboardScreen(onLowStockClick: () -> Unit, viewModel: DashboardViewModel =
                 StatCard(
                     value = products.size.toString(),
                     label = stringResource(R.string.stat_total_products),
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f).clickable(onClick = onProductsClick)
                 )
                 StatCard(
                     value = lowStockCount.toString(),
                     label = stringResource(R.string.stat_low_stock),
                     valueColor = StockWarn,
-                    modifier = Modifier.weight(1f).clickable(onClick = onLowStockClick)
+                    modifier = Modifier.weight(1f).clickable(onClick = onAlertsClick)
                 )
                 StatCard(
                     value = outOfStockCount.toString(),
                     label = stringResource(R.string.stat_out_of_stock),
                     valueColor = StockBad,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f).clickable(onClick = onAlertsClick)
                 )
             }
         }
