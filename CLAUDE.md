@@ -1,13 +1,18 @@
 # CLAUDE.md — StockGuard+
 
 **Status: Auth + Firestore wired, core loop works.** Sign up (email/password,
-creates an org), sign in, sign out, Dashboard, Product list, Add product, and
+creates an org), sign in, sign out, Dashboard, Product list, Add product,
 Category management (add/rename/delete, with delete reassigning affected
-products to "Uncategorized") are backed by real Firestore data — verified
-end to end 2026-07-10. Product detail, edit product, low-stock alerts, and
-barcode scanning are still placeholder screens. Google Sign-In is declared in
-the stack but not implemented yet (needs a SHA-1 fingerprint added in the
-Firebase console first).
+products to "Uncategorized"), Product detail, Company management ("Firmalar"
+— add/delete), and stock in/out movements are all backed by real Firestore
+data — verified end to end 2026-07-11. Stock is no longer edited directly:
+every quantity change goes through a "Stok Girişi" (in) or "Stok Çıkışı"
+(out) action tied to a required company (supplier or customer, no
+distinction), recorded atomically with the product's quantity via a Firestore
+transaction, with an in-app movement history per product. Edit product,
+low-stock alerts list, and barcode scanning are still placeholder screens.
+Google Sign-In is declared in the stack but not implemented yet (needs a
+SHA-1 fingerprint added in the Firebase console first).
 
 ## What this is
 
@@ -46,18 +51,32 @@ because v1 has no team invites yet. When employee accounts are built (see
 Roadmap), this needs a real `uid -> orgId` lookup and `firestore.rules` (repo
 root) needs updating to match — right now its `orgId == request.auth.uid`
 check would block any invited employee.
-- `organizations/{orgId}/products/{productId}` — name, SKU, barcode,
-  categoryId, unit, reorderPoint, photoUrl (optional). `categoryId` is a
-  real reference into `categories` (empty string = uncategorized); deleting
-  a category reassigns its products to `categoryId = ""` via a batch write
-  in `FirebaseCategoryRepository.deleteCategory`.
+- `organizations/{orgId}/products/{productId}` — name, sku, quantity,
+  reorderPoint, categoryId. `categoryId` is a real reference into
+  `categories` (empty string = uncategorized); deleting a category reassigns
+  its products to `categoryId = ""` via a batch write in
+  `FirebaseCategoryRepository.deleteCategory`. `quantity` lives directly on
+  the product doc (v1 simplification — no separate per-location `stock`
+  collection yet; see multi-location note below) and is only ever changed
+  via `FirebaseMovementRepository.recordMovement`, never written directly.
 - `organizations/{orgId}/categories/{categoryId}` — name, sortOrder
-- `organizations/{orgId}/locations/{locationId}` — name (v1: single implicit
-  location, schema ready for multi-warehouse)
-- `organizations/{orgId}/stock/{productId_locationId}` — current quantity,
-  kept as its own doc (not embedded in the product) for fast reads
-- `organizations/{orgId}/movements/{movementId}` — productId, locationId,
-  delta, type (`in`/`out`/`adjustment`), timestamp, userId
+- `organizations/{orgId}/parties/{partyId}` — name, address, phone1, phone2,
+  email. A flat list of companies — supplier or customer, no type
+  distinction (matches how small businesses actually use one contact list
+  for both). Selected on every stock movement; required, not optional.
+- `organizations/{orgId}/movements/{movementId}` — productId, type
+  (`in`/`out`), quantity, partyId (required reference into `parties`),
+  userId, timestamp (server timestamp). Written together with the product's
+  `quantity` update inside one Firestore transaction in
+  `FirebaseMovementRepository.recordMovement`, so the two can never drift.
+  `out` movements are rejected in the transaction if `quantity` exceeds
+  current stock (throws `InsufficientStockException`) — stock never goes
+  negative. Movement history per product is fetched by `productId` only and
+  sorted client-side (avoids needing a Firestore composite index for a
+  `productId` + `timestamp` query).
+- `organizations/{orgId}/locations/{locationId}` — not implemented yet
+  (planned for multi-warehouse, see Roadmap); `quantity` above assumes a
+  single implicit location until that lands.
 
 Firestore security rules must filter every query by `orgId` — that's the
 only real data-isolation boundary between businesses. Don't add a feature
@@ -92,11 +111,16 @@ a column.
 1. Onboarding + sign-in (email/password + Google) with language picker
 2. Dashboard — total products, low-stock count, out-of-stock count
 3. Product list — search, category filter, stock-status badge
-4. Product detail — stock history, barcode, adjust stock
-5. Add/edit product
+4. Product detail — done: stock movement history, stock in/out (barcode
+   entry point still pending, see item 7)
+5. Add/edit product — add done, edit still a placeholder screen
 6. Category management (inside Settings: add/rename/delete — deleting
    reassigns affected products to "Uncategorized", no blocking dialog)
-7. Quick stock in/out via barcode scan
+6b. Company management (inside Settings, "Firmalar": add/delete — no
+    rename yet). Required on every stock in/out movement.
+7. Quick stock in/out via barcode scan — in/out flow (with required company
+   + movement history) done; barcode-scan entry point not built yet, still
+   manual quantity entry
 8. Low-stock alerts (in-app list + push notification)
 9. Settings — language, subscription status, account
 
@@ -141,22 +165,88 @@ future bump is needed.
    to regenerate the wrapper.
 2. Firebase is wired: a project exists, `google-services.json` is in `app/`
    (gitignored — every dev machine needs their own copy from the Firebase
-   console), Firestore and Email/Password Auth are enabled. Firestore is
-   still in **test mode** in the console — `firestore.rules` (repo root) has
-   the real rules but they haven't been pasted into the console's Rules tab
-   yet. Do that before this goes anywhere near real user data.
-3. `TopAppBar` needs `ExperimentalMaterial3Api` opt-in — this is enabled
+   console), Firestore and Email/Password Auth are enabled. `firestore.rules`
+   (repo root) is deployed to the live Rules release as of 2026-07-11 (pushed
+   via the Firebase Rules REST API using a temporary service account key,
+   since the CLI's `firebase login` needs a real interactive browser session
+   this dev setup doesn't have) — test mode is closed. Any future change to
+   `firestore.rules` needs to be redeployed the same way (or via
+   `firebase deploy --only firestore:rules` from a machine that can do
+   interactive `firebase login`); editing the file alone does nothing.
+3. Launcher icon is the real StockGuard+ mark as of 2026-07-11 (shield +
+   boxes, indigo `#3B4B8C` on `#F4F6F8` — matches the Kağıt palette exactly):
+   `drawable-nodpi/ic_launcher_foreground.png` (background-removed via a
+   PowerShell/GDI+ color-key script, since this dev machine has neither
+   ImageMagick nor Python/PIL) + `drawable/ic_launcher_background.xml` set to
+   `#F4F6F8`. `store-assets/` (repo root, not part of the app build) holds
+   the Play Console listing assets: `playstore_icon_512.png` (512×512) and
+   `feature_graphic_1024x500.png` (center-cropped from the original
+   1024×572 export to hit Play's exact 1024×500 spec). Store screenshots
+   still need to be captured from the running app before submission.
+4. `TopAppBar` needs `ExperimentalMaterial3Api` opt-in — this is enabled
    project-wide via `freeCompilerArgs` in `app/build.gradle.kts`, don't
    re-add per-function `@OptIn` annotations for it.
-4. To install on a physical device: enable Developer Options + USB debugging
+5. To install on a physical device: enable Developer Options + USB debugging
    on the phone, connect via USB, confirm the RSA prompt on the device, then
    `adb install -r app/build/outputs/apk/debug/app-debug.apk`.
 
 ## Release process
 
-Google Play: bump `versionCode`, build the AAB, upload via Play Console.
-Consider a staged rollout (10% → 50% → 100%) for anything riskier than a
-copy change.
+`app/build.gradle.kts` reads release signing from `keystore.properties`
+(repo root, gitignored) if it exists — see "Generate the release keystore"
+below for the one-time setup. Without that file, `bundleRelease` still
+compiles but produces an unsigned AAB Play Console will reject.
+
+### Generate the release keystore (one-time, do this yourself — see why below)
+
+The keystore signs every future update to this app. Lose it (or its
+passwords) and you may permanently lose the ability to publish updates
+under this app's identity — this is the one credential in this project
+Claude should not generate and hold on your behalf. Two ways to create it:
+
+**Android Studio (recommended — handles passwords without them touching
+shell history or a terminal):**
+1. Build menu → Generate Signed Bundle / APK → Android App Bundle → Next.
+2. Under "Key store path", click **Create new...**
+3. Pick a save path *outside* the repo (or inside it — it's gitignored
+   either way, but outside is safer against an accidental `git add -A`),
+   set a store password, key alias (e.g. `stockguardplus`), key password,
+   validity (25+ years — Google itself recommends this so it outlives the
+   app), and your org/name details for the certificate.
+4. Finish creating the key, then continue the wizard: select `release`
+   build variant → Finish. Studio builds a signed AAB directly.
+
+**Command line (if you'd rather not use the Studio wizard):**
+```
+keytool -genkey -v -keystore stockguardplus-release.jks -keyalg RSA -keysize 2048 -validity 10000 -alias stockguardplus
+```
+`keytool` ships with the JDK (Android Studio's bundled JBR has it too, at
+`C:\Program Files\Android\Android Studio\jbr\bin\keytool.exe`).
+
+**Either way, immediately after:** save the keystore file and its two
+passwords + alias in a password manager. Then create `keystore.properties`
+in the repo root (gitignored, already wired into `build.gradle.kts`):
+```
+storeFile=C:\\path\\to\\stockguardplus-release.jks
+storePassword=...
+keyAlias=stockguardplus
+keyPassword=...
+```
+From then on, `./gradlew bundleRelease` produces a signed AAB at
+`app/build/outputs/bundle/release/app-release.aab`, ready to upload.
+
+**Play App Signing:** on your *first* upload to Play Console, opt into
+**Play App Signing** (it's the default now) — Google then holds the actual
+signing key and your local keystore becomes an "upload key" instead. If you
+ever lose the upload key, Play Console support can reset it; without Play
+App Signing, losing the keystore is unrecoverable. Opt in.
+
+### Every release after that
+
+Bump `versionCode` (and `versionName` if it's a user-visible version bump)
+in `app/build.gradle.kts`, `./gradlew bundleRelease`, upload the AAB via
+Play Console. Consider a staged rollout (10% → 50% → 100%) for anything
+riskier than a copy change.
 
 ## Working with this repo
 
