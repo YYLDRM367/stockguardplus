@@ -149,8 +149,14 @@ a column.
 8. Low-stock alerts — in-app list still a placeholder screen (reachable from
    the Dashboard's "Low stock" stat card); push notification not started.
 9. Settings — language picker (EN/TR, in-app override independent of device
-   locale) done; subscription status still pending (no billing yet, see
-   Roadmap)
+   locale) done; Profile section shows the signed-in account's email
+   (read-only) and an in-app **Delete account** action (Play Store policy
+   requires this for any app with in-app account creation) — re-
+   authenticates with the account password, deletes every Firestore
+   collection under `organizations/{orgId}` (products, categories, parties,
+   orders, movements, members) in batches, then deletes the Firebase Auth
+   user itself. Subscription status still pending (no billing yet, see
+   Roadmap).
 
 Explicitly **out of scope for v1** — see Roadmap below. Don't build these
 unless asked, even if they seem like a natural extension of a screen above.

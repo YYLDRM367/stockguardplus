@@ -8,13 +8,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,8 +27,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.stockguardplus.app.R
+import com.stockguardplus.app.ui.theme.PaperMuted
+import com.stockguardplus.app.ui.theme.StockBad
 
 private val languageOptions = listOf(
     null to R.string.language_system,
@@ -40,12 +47,20 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val languageTag by viewModel.languageTag.collectAsState()
+    val deleteAccountState by viewModel.deleteAccountState.collectAsState()
     var showLanguageDialog by remember { mutableStateOf(false) }
+    var showDeleteAccountDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
     val currentLanguageLabel = stringResource(
         languageOptions.find { it.first == languageTag }?.second ?: R.string.language_system
     )
+
+    LaunchedEffect(deleteAccountState) {
+        if (deleteAccountState is DeleteAccountState.Success) {
+            onSignedOut()
+        }
+    }
 
     Scaffold(topBar = { TopAppBar(title = { Text(stringResource(R.string.tab_settings)) }) }) { innerPadding ->
         Column(
@@ -53,6 +68,13 @@ fun SettingsScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
+            SectionLabel(stringResource(R.string.screen_profile))
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.field_account_email)) },
+                supportingContent = { Text(viewModel.currentUserEmail.orEmpty()) }
+            )
+            HorizontalDivider()
+
             ListItem(
                 headlineContent = { Text(stringResource(R.string.field_language)) },
                 supportingContent = { Text(currentLanguageLabel) },
@@ -72,6 +94,14 @@ fun SettingsScreen(
                     viewModel.signOut()
                     onSignedOut()
                 }
+            )
+
+            HorizontalDivider()
+            ListItem(
+                headlineContent = {
+                    Text(stringResource(R.string.action_delete_account), color = StockBad)
+                },
+                modifier = Modifier.clickable { showDeleteAccountDialog = true }
             )
         }
     }
@@ -108,4 +138,75 @@ fun SettingsScreen(
             }
         )
     }
+
+    if (showDeleteAccountDialog) {
+        DeleteAccountDialog(
+            state = deleteAccountState,
+            onDismiss = {
+                showDeleteAccountDialog = false
+                viewModel.resetDeleteAccountState()
+            },
+            onConfirm = { password -> viewModel.deleteAccount(password) }
+        )
+    }
+}
+
+@Composable
+private fun SectionLabel(text: String) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.labelMedium,
+        color = PaperMuted,
+        modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 4.dp)
+    )
+}
+
+@Composable
+private fun DeleteAccountDialog(
+    state: DeleteAccountState,
+    onDismiss: () -> Unit,
+    onConfirm: (String) -> Unit
+) {
+    var password by remember { mutableStateOf("") }
+    val inProgress = state is DeleteAccountState.InProgress
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.confirm_delete_account_title)) },
+        text = {
+            Column {
+                Text(stringResource(R.string.confirm_delete_account_message))
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    label = { Text(stringResource(R.string.onboarding_password)) },
+                    singleLine = true,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 12.dp)
+                )
+                if (state is DeleteAccountState.Error) {
+                    Text(
+                        text = stringResource(R.string.error_delete_account_failed),
+                        color = StockBad,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(
+                enabled = !inProgress && password.isNotBlank(),
+                onClick = { onConfirm(password) }
+            ) {
+                Text(stringResource(R.string.action_delete_account), color = StockBad)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.action_cancel))
+            }
+        }
+    )
 }

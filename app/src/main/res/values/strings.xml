@@ -108,4 +108,11 @@
     <string name="confirm_approve_order">Approve this order? Stock will update immediately and the order will be locked.</string>
     <string name="confirm_delete_order">Delete this draft order?</string>
     <string name="order_not_found">This order no longer exists.</string>
+
+    <string name="screen_profile">Profile</string>
+    <string name="field_account_email">Account email</string>
+    <string name="action_delete_account">Delete account</string>
+    <string name="confirm_delete_account_title">Delete account</string>
+    <string name="confirm_delete_account_message">This permanently deletes your account and all business data — products, orders, companies, categories. This can\'t be undone. Enter your password to confirm.</string>
+    <string name="error_delete_account_failed">Could not delete the account. Check your password and try again.</string>
 </resources>

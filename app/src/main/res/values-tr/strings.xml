@@ -108,4 +108,11 @@
     <string name="confirm_approve_order">Bu siparişi onaylamak istediğine emin misin? Stoklar hemen güncellenir ve sipariş kilitlenir.</string>
     <string name="confirm_delete_order">Bu taslak siparişi silmek istediğine emin misin?</string>
     <string name="order_not_found">Bu sipariş artık mevcut değil.</string>
+
+    <string name="screen_profile">Profil</string>
+    <string name="field_account_email">Hesap e-postası</string>
+    <string name="action_delete_account">Hesabı sil</string>
+    <string name="confirm_delete_account_title">Hesabı sil</string>
+    <string name="confirm_delete_account_message">Bu işlem hesabını ve tüm işletme verilerini (ürünler, siparişler, firmalar, kategoriler) kalıcı olarak siler. Geri alınamaz. Onaylamak için şifreni gir.</string>
+    <string name="error_delete_account_failed">Hesap silinemedi. Şifreni kontrol edip tekrar dene.</string>
 </resources>
