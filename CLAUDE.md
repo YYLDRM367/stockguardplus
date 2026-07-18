@@ -186,11 +186,13 @@ languages are translated:
 
 - Multi-location warehouse UI (schema already supports it)
 - Team members / roles (schema already supports it)
-- Supplier + purchase-order tracking
 - Reporting / analytics (stock-value trend, movement-history charts)
 - CSV / Excel import-export
 - Spanish, French, German translations
 - iOS port
+- Web dashboard/portal — same Firebase backend (Firestore + Auth + rules)
+  would serve a web frontend too, but it's a from-scratch UI build (no
+  screens shared with the Android app). Only after Android has traction.
 
 ## Local setup (first run)
 
