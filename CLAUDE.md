@@ -10,8 +10,8 @@ only changes when a multi-line Purchase Order (stock in, from a company) or
 Sales Order (stock out, to a company) is approved. An order is created as a
 `draft` (a required date, optional invoice/receipt number, one company, one
 or more product+quantity lines) and is immutable after creation — wrong
-orders get deleted and
-re-entered, not edited. Approving a draft is one Firestore transaction that
+orders get deleted and re-entered, not edited. Approving a draft is one
+Firestore transaction that
 updates every line's product quantity and writes a `Movement` record per
 line (rejecting the whole approval if any Sales Order line would take a
 product below zero), so per-product movement history and order-level
@@ -19,9 +19,13 @@ approval can never drift apart. This replaced an earlier single-product
 "Stok Girişi/Çıkışı" design that didn't match how deliveries and invoices
 actually arrive (multiple line items at once) — see "Data model" below.
 Low-stock alerts list (reachable from the Dashboard's "Low stock" stat card,
-not its own bottom tab) is still a placeholder screen. Google Sign-In is
-declared in the stack but not implemented yet (needs a SHA-1 fingerprint
-added in the Firebase console first).
+not its own bottom tab) is still a placeholder screen. A **Reports** bottom
+tab (added 2026-07-13) queries `movements` by a date range (start/end,
+Firestore range filter — the only range filter, so no composite index
+needed) and then filters client-side by type (in/out), company, and/or
+product, showing a running total-in/total-out summary plus the matching
+movement rows. Google Sign-In is declared in the stack but not implemented
+yet (needs a SHA-1 fingerprint added in the Firebase console first).
 
 ## What this is
 
@@ -161,6 +165,13 @@ a column.
    orders, movements, members) in batches, then deletes the Firebase Auth
    user itself. Subscription status still pending (no billing yet, see
    Roadmap).
+10. Reports (bottom tab) — done. Quick ranges (Today/This week/This month)
+    plus custom start/end date pickers, filters for movement type
+    (in/out/all), company, and product, a total-in/total-out/movement-count
+    summary, and the matching movement rows. Covers: incoming stock in a
+    range, outgoing stock in a range, stock from/to a specific company in a
+    range, and a single product's movement history in a range — all via
+    filter combinations on one screen rather than separate report screens.
 
 Explicitly **out of scope for v1** — see Roadmap below. Don't build these
 unless asked, even if they seem like a natural extension of a screen above.
@@ -186,7 +197,13 @@ languages are translated:
 
 - Multi-location warehouse UI (schema already supports it)
 - Team members / roles (schema already supports it)
-- Reporting / analytics (stock-value trend, movement-history charts)
+- Stock-value reporting (₺) — needs a unit price/cost field on Product
+  first, which doesn't exist yet
+- Further reports beyond the Reports screen's date/type/company/product
+  filters (see MVP scope item 10): top-moving products ranking, an
+  all-companies summary table (in one view instead of picking one company
+  at a time), a category-level movement summary, and an approved-orders
+  list report (order no./date/company/line count, not per-line movements)
 - CSV / Excel import-export
 - Spanish, French, German translations
 - iOS port

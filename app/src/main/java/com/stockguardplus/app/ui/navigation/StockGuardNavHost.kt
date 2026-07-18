@@ -3,6 +3,7 @@ package com.stockguardplus.app.ui.navigation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Assignment
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.Inventory2
 import androidx.compose.material.icons.filled.Settings
@@ -38,6 +39,7 @@ import com.stockguardplus.app.ui.screens.orders.CreateOrderScreen
 import com.stockguardplus.app.ui.screens.orders.OrderDetailScreen
 import com.stockguardplus.app.ui.screens.orders.OrdersScreen
 import com.stockguardplus.app.ui.screens.products.AddEditProductScreen
+import com.stockguardplus.app.ui.screens.reports.ReportsScreen
 import com.stockguardplus.app.ui.screens.products.ProductDetailScreen
 import com.stockguardplus.app.ui.screens.products.ProductListScreen
 import com.stockguardplus.app.ui.screens.scanner.BarcodeLookupScreen
@@ -50,6 +52,7 @@ private val bottomTabs = listOf(
     BottomTab(Screen.Dashboard, Icons.Filled.Dashboard, R.string.tab_dashboard),
     BottomTab(Screen.Products, Icons.Filled.Inventory2, R.string.tab_products),
     BottomTab(Screen.Orders, Icons.AutoMirrored.Filled.Assignment, R.string.tab_orders),
+    BottomTab(Screen.Reports, Icons.Filled.BarChart, R.string.tab_reports),
     BottomTab(Screen.Settings, Icons.Filled.Settings, R.string.tab_settings)
 )
 
@@ -225,6 +228,9 @@ fun StockGuardNavHost(navStartViewModel: NavStartViewModel = hiltViewModel()) {
                     orderId = orderId,
                     onDeleted = { navController.popBackStack() }
                 )
+            }
+            composable(Screen.Reports.route) {
+                ReportsScreen()
             }
             composable(Screen.Categories.route) {
                 CategoriesScreen()

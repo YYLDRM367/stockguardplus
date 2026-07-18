@@ -13,8 +13,22 @@
     <string name="tab_dashboard">Panel</string>
     <string name="tab_products">Ürünler</string>
     <string name="tab_orders">Siparişler</string>
+    <string name="tab_reports">Raporlar</string>
     <string name="tab_alerts">Uyarılar</string>
     <string name="tab_settings">Ayarlar</string>
+
+    <string name="report_quick_today">Bugün</string>
+    <string name="report_quick_week">Bu hafta</string>
+    <string name="report_quick_month">Bu ay</string>
+    <string name="field_start_date">Başlangıç tarihi</string>
+    <string name="field_end_date">Bitiş tarihi</string>
+    <string name="report_type_all">Hepsi</string>
+    <string name="field_all_companies">Tüm firmalar</string>
+    <string name="field_all_products">Tüm ürünler</string>
+    <string name="report_total_in">Toplam giriş</string>
+    <string name="report_total_out">Toplam çıkış</string>
+    <string name="report_movement_count">Hareket sayısı</string>
+    <string name="report_empty">Bu aralıkta hareket yok.</string>
 
     <string name="alerts_empty">Şu an az stoklu ya da tükenmiş ürün yok.</string>
     <string name="stat_total_products">Ürün</string>

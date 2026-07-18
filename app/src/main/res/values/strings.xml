@@ -13,8 +13,22 @@
     <string name="tab_dashboard">Dashboard</string>
     <string name="tab_products">Products</string>
     <string name="tab_orders">Orders</string>
+    <string name="tab_reports">Reports</string>
     <string name="tab_alerts">Alerts</string>
     <string name="tab_settings">Settings</string>
+
+    <string name="report_quick_today">Today</string>
+    <string name="report_quick_week">This week</string>
+    <string name="report_quick_month">This month</string>
+    <string name="field_start_date">Start date</string>
+    <string name="field_end_date">End date</string>
+    <string name="report_type_all">All</string>
+    <string name="field_all_companies">All companies</string>
+    <string name="field_all_products">All products</string>
+    <string name="report_total_in">Total in</string>
+    <string name="report_total_out">Total out</string>
+    <string name="report_movement_count">Movements</string>
+    <string name="report_empty">No movements in this range.</string>
 
     <string name="alerts_empty">No low-stock or out-of-stock products right now.</string>
     <string name="stat_total_products">Products</string>

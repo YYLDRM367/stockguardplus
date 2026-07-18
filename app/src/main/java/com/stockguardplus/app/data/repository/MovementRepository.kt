@@ -5,4 +5,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface MovementRepository {
     fun observeMovements(productId: String): Flow<List<Movement>>
+
+    fun observeMovementsInRange(startMillis: Long, endMillis: Long): Flow<List<Movement>>
 }
