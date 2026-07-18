@@ -17,6 +17,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -33,13 +34,22 @@ import com.stockguardplus.app.ui.theme.PaperSurface
 
 @Composable
 fun LowStockAlertsScreen(
+    filter: AlertFilter,
     onProductClick: (String) -> Unit,
     viewModel: AlertsViewModel = hiltViewModel()
 ) {
+    LaunchedEffect(filter) { viewModel.setFilter(filter) }
+
     val products by viewModel.alertProducts.collectAsState()
 
+    val titleRes = when (filter) {
+        AlertFilter.LOW_STOCK -> R.string.stat_low_stock
+        AlertFilter.OUT_OF_STOCK -> R.string.stat_out_of_stock
+        AlertFilter.ALL -> R.string.tab_alerts
+    }
+
     Scaffold(
-        topBar = { TopAppBar(title = { Text(stringResource(R.string.tab_alerts)) }) }
+        topBar = { TopAppBar(title = { Text(stringResource(titleRes)) }) }
     ) { innerPadding ->
         if (products.isEmpty()) {
             Box(
@@ -75,7 +85,7 @@ private fun AlertRow(product: Product, onClick: () -> Unit) {
             .fillMaxWidth()
             .clickable(onClick = onClick)
             .background(PaperSurface, MaterialTheme.shapes.small)
-            .border(1.dp, PaperBorder, MaterialTheme.shapes.small)
+            .border(1.5.dp, PaperBorder, MaterialTheme.shapes.small)
             .padding(12.dp)
     ) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {

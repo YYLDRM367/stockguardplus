@@ -119,7 +119,7 @@ private fun OrderRow(order: Order, companyName: String?, onClick: () -> Unit) {
             .fillMaxWidth()
             .clickable(onClick = onClick)
             .background(PaperSurface, MaterialTheme.shapes.small)
-            .border(1.dp, PaperBorder, MaterialTheme.shapes.small)
+            .border(1.5.dp, PaperBorder, MaterialTheme.shapes.small)
             .padding(12.dp)
     ) {
         val dateFormatter = remember { DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault()) }

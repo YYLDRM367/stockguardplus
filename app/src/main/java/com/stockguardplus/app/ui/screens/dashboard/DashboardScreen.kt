@@ -39,7 +39,8 @@ import java.util.Locale
 @Composable
 fun DashboardScreen(
     onProductsClick: () -> Unit,
-    onAlertsClick: () -> Unit,
+    onLowStockClick: () -> Unit,
+    onOutOfStockClick: () -> Unit,
     onProductClick: (String) -> Unit,
     viewModel: DashboardViewModel = hiltViewModel()
 ) {
@@ -78,13 +79,13 @@ fun DashboardScreen(
                     value = lowStockCount.toString(),
                     label = stringResource(R.string.stat_low_stock),
                     valueColor = StockWarn,
-                    modifier = Modifier.weight(1f).clickable(onClick = onAlertsClick)
+                    modifier = Modifier.weight(1f).clickable(onClick = onLowStockClick)
                 )
                 StatCard(
                     value = outOfStockCount.toString(),
                     label = stringResource(R.string.stat_out_of_stock),
                     valueColor = StockBad,
-                    modifier = Modifier.weight(1f).clickable(onClick = onAlertsClick)
+                    modifier = Modifier.weight(1f).clickable(onClick = onOutOfStockClick)
                 )
             }
 
@@ -132,7 +133,7 @@ private fun RecentMovementRow(
             .fillMaxWidth()
             .clickable(onClick = onClick)
             .background(PaperSurface, MaterialTheme.shapes.small)
-            .border(1.dp, PaperBorder, MaterialTheme.shapes.small)
+            .border(1.5.dp, PaperBorder, MaterialTheme.shapes.small)
             .padding(12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically

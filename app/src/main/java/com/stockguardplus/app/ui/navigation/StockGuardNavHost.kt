@@ -30,6 +30,7 @@ import androidx.navigation.navArgument
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.stockguardplus.app.R
 import com.stockguardplus.app.data.model.OrderType
+import com.stockguardplus.app.ui.screens.alerts.AlertFilter
 import com.stockguardplus.app.ui.screens.alerts.LowStockAlertsScreen
 import com.stockguardplus.app.ui.screens.categories.CategoriesScreen
 import com.stockguardplus.app.ui.screens.companies.CompaniesScreen
@@ -112,7 +113,8 @@ fun StockGuardNavHost(navStartViewModel: NavStartViewModel = hiltViewModel()) {
                             restoreState = true
                         }
                     },
-                    onAlertsClick = { navController.navigate(Screen.Alerts.route) },
+                    onLowStockClick = { navController.navigate(Screen.Alerts.createRoute(AlertFilter.LOW_STOCK)) },
+                    onOutOfStockClick = { navController.navigate(Screen.Alerts.createRoute(AlertFilter.OUT_OF_STOCK)) },
                     onProductClick = { id -> navController.navigate(Screen.ProductDetail.createRoute(id)) }
                 )
             }
@@ -239,8 +241,20 @@ fun StockGuardNavHost(navStartViewModel: NavStartViewModel = hiltViewModel()) {
             composable(Screen.Companies.route) {
                 CompaniesScreen()
             }
-            composable(Screen.Alerts.route) {
+            composable(
+                route = Screen.Alerts.route,
+                arguments = listOf(
+                    navArgument("filter") {
+                        type = NavType.StringType
+                        nullable = true
+                    }
+                )
+            ) { entry ->
+                val filter = entry.arguments?.getString("filter")
+                    ?.let { runCatching { AlertFilter.valueOf(it) }.getOrNull() }
+                    ?: AlertFilter.ALL
                 LowStockAlertsScreen(
+                    filter = filter,
                     onProductClick = { id -> navController.navigate(Screen.ProductDetail.createRoute(id)) }
                 )
             }

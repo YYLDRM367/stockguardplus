@@ -1,6 +1,7 @@
 package com.stockguardplus.app.ui.navigation
 
 import com.stockguardplus.app.data.model.OrderType
+import com.stockguardplus.app.ui.screens.alerts.AlertFilter
 import java.net.URLDecoder
 import java.net.URLEncoder
 
@@ -15,7 +16,9 @@ sealed class Screen(val route: String) {
     data object Companies : Screen("companies")
     data object Orders : Screen("orders")
     data object Reports : Screen("reports")
-    data object Alerts : Screen("alerts")
+    data object Alerts : Screen("alerts?filter={filter}") {
+        fun createRoute(filter: AlertFilter = AlertFilter.ALL) = "alerts?filter=${filter.name}"
+    }
     data object Settings : Screen("settings")
 
     data object CreateOrder : Screen("orders/create/{type}") {

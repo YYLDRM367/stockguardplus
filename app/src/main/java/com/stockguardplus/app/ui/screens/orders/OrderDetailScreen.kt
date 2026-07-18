@@ -201,7 +201,7 @@ private fun OrderLineRowReadOnly(line: OrderLine, productName: String) {
         modifier = Modifier
             .fillMaxWidth()
             .background(PaperSurface, MaterialTheme.shapes.small)
-            .border(1.dp, PaperBorder, MaterialTheme.shapes.small)
+            .border(1.5.dp, PaperBorder, MaterialTheme.shapes.small)
             .padding(12.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {

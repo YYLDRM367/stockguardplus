@@ -18,13 +18,17 @@ product below zero), so per-product movement history and order-level
 approval can never drift apart. This replaced an earlier single-product
 "Stok Girişi/Çıkışı" design that didn't match how deliveries and invoices
 actually arrive (multiple line items at once) — see "Data model" below.
-Low-stock alerts list (reachable from the Dashboard's "Low stock" stat card,
-not its own bottom tab) is still a placeholder screen. A **Reports** bottom
-tab (added 2026-07-13) queries `movements` by a date range (start/end,
-Firestore range filter — the only range filter, so no composite index
-needed) and then filters client-side by type (in/out), company, and/or
-product, showing a running total-in/total-out summary plus the matching
-movement rows. Google Sign-In is declared in the stack but not implemented
+Low-stock/out-of-stock alerts list (reachable from the Dashboard's stat
+cards, not its own bottom tab) shows a real, filtered product list —
+`AlertFilter` (`ALL`/`LOW_STOCK`/`OUT_OF_STOCK`) is passed through the
+`Screen.Alerts` route so the "Low stock" and "Out of stock" cards each open
+the list pre-filtered to just that status, instead of both showing the same
+combined list. A **Reports** bottom tab (added 2026-07-13) queries
+`movements` by a date range (start/end, Firestore range filter — the only
+range filter, so no composite index needed) and then filters client-side by
+type (in/out), company, and/or product, showing a running
+total-in/total-out summary plus the matching movement rows. Google
+Sign-In is declared in the stack but not implemented
 yet (needs a SHA-1 fingerprint added in the Firebase console first).
 
 ## What this is
@@ -130,10 +134,11 @@ Colors:
 | Warn | `#B7791F` | low stock |
 | Bad | `#C53030` | out of stock |
 
-Shape/type: 6dp corner radius, 1dp hairline borders, no gradients, generous
-whitespace. Typeface is the system default (Roboto) — don't introduce a
-custom font. Quantities/SKUs use tabular figures wherever digits line up in
-a column.
+Shape/type: 6dp corner radius, 1.5dp borders (bumped from the original 1dp
+hairline 2026-07-18 — the row cards across Products/Orders/Reports/
+Dashboard/Alerts read too faint at 1dp), no gradients, generous whitespace.
+Typeface is the system default (Roboto) — don't introduce a custom font.
+Quantities/SKUs use tabular figures wherever digits line up in a column.
 
 ## MVP scope
 
@@ -161,8 +166,9 @@ a column.
    model"). Barcode scan on the product list jumps straight to a matched
    product's detail screen, or offers to create a new product with that
    barcode if nothing matches.
-8. Low-stock alerts — in-app list still a placeholder screen (reachable from
-   the Dashboard's "Low stock" stat card); push notification not started.
+8. Low-stock alerts — done: in-app list reachable from the Dashboard's
+   "Low stock"/"Out of stock" stat cards, each pre-filtered to that status
+   (`AlertFilter`); push notification not started.
 9. Settings — language picker (EN/TR, in-app override independent of device
    locale) done; Profile section shows the signed-in account's email
    (read-only) and an in-app **Delete account** action (Play Store policy

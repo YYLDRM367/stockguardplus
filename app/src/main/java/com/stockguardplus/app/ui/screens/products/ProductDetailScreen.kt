@@ -174,7 +174,7 @@ private fun DetailField(labelRes: Int, value: String) {
         modifier = Modifier
             .fillMaxWidth()
             .background(PaperSurface, MaterialTheme.shapes.small)
-            .border(1.dp, PaperBorder, MaterialTheme.shapes.small)
+            .border(1.5.dp, PaperBorder, MaterialTheme.shapes.small)
             .padding(12.dp)
     ) {
         Text(text = stringResource(labelRes), style = MaterialTheme.typography.labelMedium, color = PaperMuted)
@@ -189,7 +189,7 @@ private fun MovementRow(movement: Movement, companyName: String?) {
         modifier = Modifier
             .fillMaxWidth()
             .background(PaperSurface, MaterialTheme.shapes.small)
-            .border(1.dp, PaperBorder, MaterialTheme.shapes.small)
+            .border(1.5.dp, PaperBorder, MaterialTheme.shapes.small)
             .padding(12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically

@@ -324,7 +324,7 @@ private fun SummaryCard(summary: ReportSummary) {
         modifier = Modifier
             .fillMaxWidth()
             .background(PaperSurface, MaterialTheme.shapes.small)
-            .border(1.dp, PaperBorder, MaterialTheme.shapes.small)
+            .border(1.5.dp, PaperBorder, MaterialTheme.shapes.small)
             .padding(12.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -354,7 +354,7 @@ private fun ReportMovementRow(
         modifier = Modifier
             .fillMaxWidth()
             .background(PaperSurface, MaterialTheme.shapes.small)
-            .border(1.dp, PaperBorder, MaterialTheme.shapes.small)
+            .border(1.5.dp, PaperBorder, MaterialTheme.shapes.small)
             .padding(12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
