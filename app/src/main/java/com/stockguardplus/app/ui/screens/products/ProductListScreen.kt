@@ -11,14 +11,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.QrCodeScanner
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -31,6 +35,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.stockguardplus.app.R
+import com.stockguardplus.app.data.model.Category
 import com.stockguardplus.app.data.model.Product
 import com.stockguardplus.app.ui.components.StockStatusChip
 import com.stockguardplus.app.ui.theme.PaperBorder
@@ -45,6 +50,10 @@ fun ProductListScreen(
     viewModel: ProductListViewModel = hiltViewModel()
 ) {
     val products by viewModel.products.collectAsState()
+    val categories by viewModel.categories.collectAsState()
+    val searchText by viewModel.searchText.collectAsState()
+    val selectedCategoryId by viewModel.selectedCategoryId.collectAsState()
+    val hasAnyProducts = products.isNotEmpty() || searchText.isNotBlank() || selectedCategoryId != null
 
     Scaffold(
         topBar = {
@@ -63,30 +72,74 @@ fun ProductListScreen(
             }
         }
     ) { innerPadding ->
-        if (products.isEmpty()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = stringResource(R.string.products_empty),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+        Column(modifier = Modifier.padding(innerPadding)) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedTextField(
+                    value = searchText,
+                    onValueChange = viewModel::onSearchTextChange,
+                    placeholder = { Text(stringResource(R.string.field_search_product)) },
+                    leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                CategoryFilterRow(
+                    categories = categories,
+                    selectedCategoryId = selectedCategoryId,
+                    onCategorySelected = viewModel::onCategorySelected
                 )
             }
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(products, key = { it.id }) { product ->
-                    ProductRow(product = product, onClick = { onProductClick(product.id) })
+
+            if (products.isEmpty()) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(
+                        text = stringResource(
+                            if (hasAnyProducts) R.string.products_empty_filtered else R.string.products_empty
+                        ),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(products, key = { it.id }) { product ->
+                        ProductRow(product = product, onClick = { onProductClick(product.id) })
+                    }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun CategoryFilterRow(
+    categories: List<Category>,
+    selectedCategoryId: String?,
+    onCategorySelected: (String?) -> Unit
+) {
+    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        item {
+            FilterChip(
+                selected = selectedCategoryId == null,
+                onClick = { onCategorySelected(null) },
+                label = { Text(stringResource(R.string.category_all)) }
+            )
+        }
+        item {
+            FilterChip(
+                selected = selectedCategoryId == "",
+                onClick = { onCategorySelected("") },
+                label = { Text(stringResource(R.string.category_uncategorized)) }
+            )
+        }
+        items(categories, key = { it.id }) { category ->
+            FilterChip(
+                selected = selectedCategoryId == category.id,
+                onClick = { onCategorySelected(category.id) },
+                label = { Text(category.name) }
+            )
         }
     }
 }

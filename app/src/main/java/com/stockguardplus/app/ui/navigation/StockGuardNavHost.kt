@@ -112,7 +112,8 @@ fun StockGuardNavHost(navStartViewModel: NavStartViewModel = hiltViewModel()) {
                             restoreState = true
                         }
                     },
-                    onAlertsClick = { navController.navigate(Screen.Alerts.route) }
+                    onAlertsClick = { navController.navigate(Screen.Alerts.route) },
+                    onProductClick = { id -> navController.navigate(Screen.ProductDetail.createRoute(id)) }
                 )
             }
             composable(Screen.Products.route) {

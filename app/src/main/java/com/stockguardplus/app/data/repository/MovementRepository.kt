@@ -7,4 +7,6 @@ interface MovementRepository {
     fun observeMovements(productId: String): Flow<List<Movement>>
 
     fun observeMovementsInRange(startMillis: Long, endMillis: Long): Flow<List<Movement>>
+
+    fun observeRecentMovements(limit: Int): Flow<List<Movement>>
 }

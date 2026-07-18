@@ -33,6 +33,7 @@
     <string name="report_csv_header_type">Type</string>
 
     <string name="alerts_empty">No low-stock or out-of-stock products right now.</string>
+    <string name="dashboard_recent_activity">Recent activity</string>
     <string name="stat_total_products">Products</string>
     <string name="stat_low_stock">Low stock</string>
     <string name="stat_out_of_stock">Out of stock</string>
@@ -58,6 +59,9 @@
     <string name="field_category">Category</string>
     <string name="action_save">Save</string>
     <string name="products_empty">No products yet. Tap + to add one.</string>
+    <string name="products_empty_filtered">No products match this search/filter.</string>
+    <string name="field_search_product">Search products</string>
+    <string name="category_all">All</string>
     <string name="action_sign_out">Sign out</string>
 
     <string name="field_new_category_name">New category name</string>

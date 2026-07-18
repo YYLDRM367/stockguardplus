@@ -2,6 +2,7 @@ package com.stockguardplus.app.data.repository
 
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.stockguardplus.app.data.model.Movement
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -57,6 +58,26 @@ class FirebaseMovementRepository @Inject constructor(
                         .mapNotNull { it.toObject(Movement::class.java) }
                         .sortedByDescending { it.timestamp?.seconds ?: 0 }
                     trySend(movements)
+                }
+            awaitClose { registration.remove() }
+        }
+    }
+
+    override fun observeRecentMovements(limit: Int): Flow<List<Movement>> {
+        val orgId = authRepository.currentOrgId ?: return flowOf(emptyList())
+
+        return callbackFlow {
+            val registration = firestore.collection("organizations")
+                .document(orgId)
+                .collection("movements")
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .limit(limit.toLong())
+                .addSnapshotListener { snapshot, error ->
+                    if (error != null) {
+                        close(error)
+                        return@addSnapshotListener
+                    }
+                    trySend(snapshot?.documents.orEmpty().mapNotNull { it.toObject(Movement::class.java) })
                 }
             awaitClose { registration.remove() }
         }

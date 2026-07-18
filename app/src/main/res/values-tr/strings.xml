@@ -33,6 +33,7 @@
     <string name="report_csv_header_type">Tip</string>
 
     <string name="alerts_empty">Şu an az stoklu ya da tükenmiş ürün yok.</string>
+    <string name="dashboard_recent_activity">Son Hareketler</string>
     <string name="stat_total_products">Ürün</string>
     <string name="stat_low_stock">Az Stok</string>
     <string name="stat_out_of_stock">Tükendi</string>
@@ -58,6 +59,9 @@
     <string name="field_category">Kategori</string>
     <string name="action_save">Kaydet</string>
     <string name="products_empty">Henüz ürün yok. Eklemek için + simgesine dokun.</string>
+    <string name="products_empty_filtered">Bu arama/filtreye uyan ürün yok.</string>
+    <string name="field_search_product">Ürün ara</string>
+    <string name="category_all">Tümü</string>
     <string name="action_sign_out">Çıkış yap</string>
 
     <string name="field_new_category_name">Yeni kategori adı</string>

@@ -138,8 +138,15 @@ a column.
 ## MVP scope
 
 1. Onboarding + sign-in (email/password + Google) with language picker
-2. Dashboard — total products, low-stock count, out-of-stock count
-3. Product list — search, category filter, stock-status badge
+2. Dashboard — done: total/low-stock/out-of-stock stat cards (all three
+   tappable — total goes to Products, the other two to the Alerts list),
+   current date/time, and a "Recent activity" list of the 5 most recent
+   stock movements (tap one to jump to that product) via
+   `MovementRepository.observeRecentMovements`.
+3. Product list — done: search-by-name text field plus a horizontally
+   scrollable category filter row (All / Uncategorized / each category);
+   both combine (`ProductListViewModel` filters client-side on the already
+   live `observeProducts()` stream), stock-status badge
 4. Product detail — done: read-only quantity + per-product movement history.
    No in/out actions here — see item 7.
 5. Add/edit product — both done; barcode field + scan-to-fill done; editing
