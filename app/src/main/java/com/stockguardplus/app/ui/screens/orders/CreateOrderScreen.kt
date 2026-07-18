@@ -11,8 +11,11 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
@@ -23,7 +26,9 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -44,6 +49,9 @@ import com.stockguardplus.app.data.model.Product
 import com.stockguardplus.app.ui.components.AddCompanyDialog
 import com.stockguardplus.app.ui.theme.StockBad
 import kotlinx.coroutines.launch
+import java.text.DateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun CreateOrderScreen(
@@ -58,7 +66,10 @@ fun CreateOrderScreen(
     val products by viewModel.products.collectAsState()
     var companyMenuExpanded by remember { mutableStateOf(false) }
     var showAddCompanyDialog by remember { mutableStateOf(false) }
+    var showDatePicker by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+    val dateFormatter = remember { DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault()) }
+    val formattedDate = remember(uiState.dateMillis) { dateFormatter.format(Date(uiState.dateMillis)) }
 
     LaunchedEffect(uiState.isSaved) {
         if (uiState.isSaved) onSaved()
@@ -90,9 +101,28 @@ fun CreateOrderScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             OutlinedTextField(
-                value = uiState.orderNumber,
-                onValueChange = viewModel::onOrderNumberChange,
-                label = { Text(stringResource(R.string.field_order_number)) },
+                value = formattedDate,
+                onValueChange = {},
+                readOnly = true,
+                label = { Text(stringResource(R.string.field_date)) },
+                trailingIcon = {
+                    IconButton(onClick = { showDatePicker = true }) {
+                        Icon(Icons.Filled.DateRange, contentDescription = stringResource(R.string.field_date))
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
+            OutlinedTextField(
+                value = uiState.invoiceNumber,
+                onValueChange = viewModel::onInvoiceNumberChange,
+                label = { Text(stringResource(R.string.field_invoice_number)) },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+            OutlinedTextField(
+                value = uiState.receiptNumber,
+                onValueChange = viewModel::onReceiptNumberChange,
+                label = { Text(stringResource(R.string.field_receipt_number)) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -177,6 +207,28 @@ fun CreateOrderScreen(
                 }
             }
         )
+    }
+
+    if (showDatePicker) {
+        val datePickerState = rememberDatePickerState(initialSelectedDateMillis = uiState.dateMillis)
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    datePickerState.selectedDateMillis?.let { viewModel.onDateChange(it) }
+                    showDatePicker = false
+                }) {
+                    Text(stringResource(R.string.action_ok))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
     }
 }
 

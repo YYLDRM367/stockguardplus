@@ -10,7 +10,14 @@ interface OrderRepository {
 
     fun observeOrder(orderId: String): Flow<Order?>
 
-    suspend fun createOrder(type: OrderType, orderNumber: String, partyId: String, lines: List<OrderLine>): String
+    suspend fun createOrder(
+        type: OrderType,
+        dateMillis: Long,
+        invoiceNumber: String,
+        receiptNumber: String,
+        partyId: String,
+        lines: List<OrderLine>
+    ): String
 
     suspend fun approveOrder(orderId: String)
 

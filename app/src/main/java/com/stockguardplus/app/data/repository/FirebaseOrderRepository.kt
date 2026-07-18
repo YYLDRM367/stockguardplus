@@ -1,5 +1,6 @@
 package com.stockguardplus.app.data.repository
 
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.stockguardplus.app.data.model.Order
@@ -63,14 +64,18 @@ class FirebaseOrderRepository @Inject constructor(
 
     override suspend fun createOrder(
         type: OrderType,
-        orderNumber: String,
+        dateMillis: Long,
+        invoiceNumber: String,
+        receiptNumber: String,
         partyId: String,
         lines: List<OrderLine>
     ): String {
         val orgId = requireNotNull(authRepository.currentOrgId) { "Cannot create an order while signed out." }
 
         val data = mapOf(
-            "orderNumber" to orderNumber,
+            "date" to Timestamp(dateMillis / 1000, 0),
+            "invoiceNumber" to invoiceNumber,
+            "receiptNumber" to receiptNumber,
             "type" to type.value,
             "partyId" to partyId,
             "status" to OrderStatus.DRAFT.value,

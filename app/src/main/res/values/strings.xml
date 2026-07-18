@@ -50,6 +50,7 @@
     <string name="action_edit">Edit</string>
     <string name="action_delete">Delete</string>
     <string name="action_cancel">Cancel</string>
+    <string name="action_ok">OK</string>
     <string name="category_uncategorized">Uncategorized</string>
     <string name="action_add_category">+ Add new category</string>
 
@@ -91,13 +92,14 @@
     <string name="order_tab_purchase">Purchase</string>
     <string name="order_tab_sale">Sale</string>
     <string name="orders_empty">No orders yet. Tap + to create one.</string>
-    <string name="field_order_number">Order / invoice number</string>
+    <string name="field_date">Date</string>
+    <string name="field_invoice_number">Invoice no. (optional)</string>
+    <string name="field_receipt_number">Receipt no. (optional)</string>
     <string name="screen_create_purchase_order">New purchase order</string>
     <string name="screen_create_sale_order">New sales order</string>
     <string name="field_order_lines">Line items</string>
     <string name="action_add_line">+ Add line</string>
     <string name="action_remove_line">Remove line</string>
-    <string name="error_order_number_required">Order number is required.</string>
     <string name="error_at_least_one_line">Add at least one line item.</string>
     <string name="error_select_product">Select a product for every line.</string>
     <string name="error_order_save_failed">Could not save the order.</string>

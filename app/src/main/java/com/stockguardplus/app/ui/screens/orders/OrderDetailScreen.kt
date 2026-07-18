@@ -43,6 +43,8 @@ import com.stockguardplus.app.ui.theme.PaperSurface
 import com.stockguardplus.app.ui.theme.StockBad
 import com.stockguardplus.app.ui.theme.StockGood
 import com.stockguardplus.app.ui.theme.StockWarn
+import java.text.DateFormat
+import java.util.Locale
 
 @Composable
 fun OrderDetailScreen(
@@ -66,10 +68,13 @@ fun OrderDetailScreen(
         if (isDeleted) onDeleted()
     }
 
+    val dateFormatter = remember { DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault()) }
+    val formattedDate = order?.date?.toDate()?.let { dateFormatter.format(it) }
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(order?.orderNumber ?: stringResource(R.string.screen_order_detail)) },
+                title = { Text(formattedDate ?: stringResource(R.string.screen_order_detail)) },
                 actions = {
                     if (order?.orderStatus == OrderStatus.DRAFT) {
                         IconButton(onClick = { showApproveDialog = true }) {
@@ -113,6 +118,15 @@ fun OrderDetailScreen(
                             style = MaterialTheme.typography.labelLarge,
                             color = statusColor
                         )
+                    }
+                }
+
+                val reference = listOf(current.invoiceNumber, current.receiptNumber)
+                    .filter { it.isNotBlank() }
+                    .joinToString(" · ")
+                if (reference.isNotBlank()) {
+                    item {
+                        Text(text = reference, style = MaterialTheme.typography.bodyMedium, color = PaperMuted)
                     }
                 }
 

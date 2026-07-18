@@ -27,7 +27,9 @@ data class OrderLineInput(
 )
 
 data class CreateOrderUiState(
-    val orderNumber: String = "",
+    val dateMillis: Long = System.currentTimeMillis(),
+    val invoiceNumber: String = "",
+    val receiptNumber: String = "",
     val partyId: String = "",
     val lines: List<OrderLineInput> = listOf(OrderLineInput(key = 0)),
     val isSaving: Boolean = false,
@@ -58,8 +60,16 @@ class CreateOrderViewModel @Inject constructor(
         this.type = type
     }
 
-    fun onOrderNumberChange(value: String) {
-        _uiState.value = _uiState.value.copy(orderNumber = value)
+    fun onDateChange(millis: Long) {
+        _uiState.value = _uiState.value.copy(dateMillis = millis)
+    }
+
+    fun onInvoiceNumberChange(value: String) {
+        _uiState.value = _uiState.value.copy(invoiceNumber = value)
+    }
+
+    fun onReceiptNumberChange(value: String) {
+        _uiState.value = _uiState.value.copy(receiptNumber = value)
     }
 
     fun onPartySelected(partyId: String) {
@@ -107,10 +117,6 @@ class CreateOrderViewModel @Inject constructor(
     fun save() {
         val state = _uiState.value
 
-        if (state.orderNumber.isBlank()) {
-            _uiState.value = state.copy(errorMessageRes = R.string.error_order_number_required)
-            return
-        }
         if (state.partyId.isBlank()) {
             _uiState.value = state.copy(errorMessageRes = R.string.error_select_company)
             return
@@ -128,7 +134,14 @@ class CreateOrderViewModel @Inject constructor(
         _uiState.value = state.copy(isSaving = true, errorMessageRes = null)
         viewModelScope.launch {
             try {
-                orderRepository.createOrder(type, state.orderNumber.trim(), state.partyId, lines)
+                orderRepository.createOrder(
+                    type = type,
+                    dateMillis = state.dateMillis,
+                    invoiceNumber = state.invoiceNumber.trim(),
+                    receiptNumber = state.receiptNumber.trim(),
+                    partyId = state.partyId,
+                    lines = lines
+                )
                 _uiState.value = _uiState.value.copy(isSaving = false, isSaved = true)
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(isSaving = false, errorMessageRes = R.string.error_order_save_failed)

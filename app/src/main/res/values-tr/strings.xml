@@ -50,6 +50,7 @@
     <string name="action_edit">Düzenle</string>
     <string name="action_delete">Sil</string>
     <string name="action_cancel">İptal</string>
+    <string name="action_ok">Tamam</string>
     <string name="category_uncategorized">Kategorisiz</string>
     <string name="action_add_category">+ Yeni kategori ekle</string>
 
@@ -91,13 +92,14 @@
     <string name="order_tab_purchase">Satın Alma</string>
     <string name="order_tab_sale">Satış</string>
     <string name="orders_empty">Henüz sipariş yok. Eklemek için + simgesine dokun.</string>
-    <string name="field_order_number">Sipariş / fatura no</string>
+    <string name="field_date">Tarih</string>
+    <string name="field_invoice_number">Fatura no (opsiyonel)</string>
+    <string name="field_receipt_number">Fiş no (opsiyonel)</string>
     <string name="screen_create_purchase_order">Yeni satın alma siparişi</string>
     <string name="screen_create_sale_order">Yeni satış siparişi</string>
     <string name="field_order_lines">Kalemler</string>
     <string name="action_add_line">+ Satır ekle</string>
     <string name="action_remove_line">Satırı sil</string>
-    <string name="error_order_number_required">Sipariş numarası gerekli.</string>
     <string name="error_at_least_one_line">En az bir kalem eklemelisin.</string>
     <string name="error_select_product">Her satır için bir ürün seç.</string>
     <string name="error_order_save_failed">Sipariş kaydedilemedi.</string>

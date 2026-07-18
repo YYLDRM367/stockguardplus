@@ -26,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -42,6 +43,8 @@ import com.stockguardplus.app.ui.theme.PaperMuted
 import com.stockguardplus.app.ui.theme.PaperSurface
 import com.stockguardplus.app.ui.theme.StockGood
 import com.stockguardplus.app.ui.theme.StockWarn
+import java.text.DateFormat
+import java.util.Locale
 
 @Composable
 fun OrdersScreen(
@@ -119,8 +122,11 @@ private fun OrderRow(order: Order, companyName: String?, onClick: () -> Unit) {
             .border(1.dp, PaperBorder, MaterialTheme.shapes.small)
             .padding(12.dp)
     ) {
+        val dateFormatter = remember { DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault()) }
+        val formattedDate = order.date?.toDate()?.let { dateFormatter.format(it) }.orEmpty()
+
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text(text = order.orderNumber, style = MaterialTheme.typography.bodyLarge)
+            Text(text = formattedDate, style = MaterialTheme.typography.bodyLarge)
             val (statusRes, statusColor) = if (order.orderStatus == OrderStatus.APPROVED) {
                 R.string.status_approved to StockGood
             } else {
@@ -128,8 +134,10 @@ private fun OrderRow(order: Order, companyName: String?, onClick: () -> Unit) {
             }
             Text(text = stringResource(statusRes), style = MaterialTheme.typography.labelMedium, color = statusColor)
         }
+        val reference = listOf(order.invoiceNumber, order.receiptNumber).filter { it.isNotBlank() }.joinToString(" · ")
+        val secondaryLine = listOf(companyName.orEmpty(), reference).filter { it.isNotBlank() }.joinToString(" · ")
         Text(
-            text = companyName ?: "",
+            text = secondaryLine,
             style = MaterialTheme.typography.bodyMedium,
             color = PaperMuted,
             modifier = Modifier.padding(top = 4.dp)

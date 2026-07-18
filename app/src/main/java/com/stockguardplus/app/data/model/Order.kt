@@ -29,7 +29,9 @@ data class OrderLine(
 
 data class Order(
     @DocumentId val id: String = "",
-    val orderNumber: String = "",
+    val date: Timestamp? = null,
+    val invoiceNumber: String = "",
+    val receiptNumber: String = "",
     val type: String = "",
     val partyId: String = "",
     val status: String = "draft",

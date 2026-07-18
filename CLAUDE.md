@@ -8,8 +8,9 @@ are all backed by real Firestore data — verified end to end 2026-07-11.
 **Stock quantity is never edited directly or one product at a time** — it
 only changes when a multi-line Purchase Order (stock in, from a company) or
 Sales Order (stock out, to a company) is approved. An order is created as a
-`draft` (order/invoice number, one company, one or more product+quantity
-lines) and is immutable after creation — wrong orders get deleted and
+`draft` (a required date, optional invoice/receipt number, one company, one
+or more product+quantity lines) and is immutable after creation — wrong
+orders get deleted and
 re-entered, not edited. Approving a draft is one Firestore transaction that
 updates every line's product quantity and writes a `Movement` record per
 line (rejecting the whole approval if any Sales Order line would take a
@@ -73,14 +74,17 @@ check would block any invited employee.
   email. A flat list of companies — supplier or customer, no type
   distinction (matches how small businesses actually use one contact list
   for both). Selected on every order; required, not optional.
-- `organizations/{orgId}/orders/{orderId}` — orderNumber (free text, the
-  supplier/customer's own invoice or PO number — not auto-generated), type
-  (`purchase`/`sale`), partyId (required reference into `parties`), status
-  (`draft`/`approved`), lines (embedded array of `{productId, quantity}` —
-  not a subcollection, since an order is always read/written as one atomic
-  unit), userId, createdAt, approvedAt. Created as `draft` with all its
-  lines in one write via `FirebaseOrderRepository.createOrder`; drafts are
-  **not editable** — a wrong draft is deleted and re-created, not patched.
+- `organizations/{orgId}/orders/{orderId}` — date (required, user-picked via
+  a Material3 date picker — the actual invoice/receipt date, distinct from
+  `createdAt`), invoiceNumber and receiptNumber (both free text, both
+  optional — the supplier/customer's own document numbers, not
+  auto-generated), type (`purchase`/`sale`), partyId (required reference
+  into `parties`), status (`draft`/`approved`), lines (embedded array of
+  `{productId, quantity}` — not a subcollection, since an order is always
+  read/written as one atomic unit), userId, createdAt, approvedAt. Created
+  as `draft` with all its lines in one write via
+  `FirebaseOrderRepository.createOrder`; drafts are **not editable** — a
+  wrong draft is deleted and re-created, not patched.
   `FirebaseOrderRepository.approveOrder` runs one Firestore transaction that,
   for every line, updates that product's `quantity` (add for `purchase`,
   subtract for `sale`) and writes a matching `Movement` doc, then flips the
