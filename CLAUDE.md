@@ -172,6 +172,11 @@ a column.
     range, outgoing stock in a range, stock from/to a specific company in a
     range, and a single product's movement history in a range — all via
     filter combinations on one screen rather than separate report screens.
+    CSV export (`ReportCsvExporter.kt`) shares the currently filtered rows
+    via Android's share sheet — writes to `cacheDir/exports/` and hands off
+    a `content://` URI through a `FileProvider` (declared in
+    AndroidManifest.xml, paths in `res/xml/file_paths.xml`); opens directly
+    in Excel or Google Sheets from whatever app the user shares it to.
 
 Explicitly **out of scope for v1** — see Roadmap below. Don't build these
 unless asked, even if they seem like a natural extension of a screen above.

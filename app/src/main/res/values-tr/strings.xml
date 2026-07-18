@@ -29,6 +29,8 @@
     <string name="report_total_out">Toplam çıkış</string>
     <string name="report_movement_count">Hareket sayısı</string>
     <string name="report_empty">Bu aralıkta hareket yok.</string>
+    <string name="action_export">Dışa aktar</string>
+    <string name="report_csv_header_type">Tip</string>
 
     <string name="alerts_empty">Şu an az stoklu ya da tükenmiş ürün yok.</string>
     <string name="stat_total_products">Ürün</string>

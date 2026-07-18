@@ -28,6 +28,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -36,6 +37,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -68,9 +70,44 @@ fun ReportsScreen(viewModel: ReportsViewModel = hiltViewModel()) {
     var productMenuExpanded by remember { mutableStateOf(false) }
 
     val dateFormatter = remember { DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault()) }
+    val context = LocalContext.current
+
+    val csvDateLabel = stringResource(R.string.field_date)
+    val csvProductLabel = stringResource(R.string.field_product)
+    val csvTypeLabel = stringResource(R.string.report_csv_header_type)
+    val csvQuantityLabel = stringResource(R.string.field_quantity)
+    val csvCompanyLabel = stringResource(R.string.field_company)
+    val csvTypeInLabel = stringResource(R.string.movement_type_in)
+    val csvTypeOutLabel = stringResource(R.string.movement_type_out)
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text(stringResource(R.string.tab_reports)) }) }
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.tab_reports)) },
+                actions = {
+                    IconButton(onClick = {
+                        shareMovementsAsCsv(
+                            context = context,
+                            movements = movements,
+                            productNameById = productNameById,
+                            companyNameById = companyNameById,
+                            dateFormatter = dateFormatter,
+                            labels = CsvColumnLabels(
+                                date = csvDateLabel,
+                                product = csvProductLabel,
+                                type = csvTypeLabel,
+                                quantity = csvQuantityLabel,
+                                company = csvCompanyLabel,
+                                typeIn = csvTypeInLabel,
+                                typeOut = csvTypeOutLabel
+                            )
+                        )
+                    }) {
+                        Icon(Icons.Filled.Share, contentDescription = stringResource(R.string.action_export))
+                    }
+                }
+            )
+        }
     ) { innerPadding ->
         LazyColumn(
             modifier = Modifier

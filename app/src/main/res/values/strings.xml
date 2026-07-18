@@ -29,6 +29,8 @@
     <string name="report_total_out">Total out</string>
     <string name="report_movement_count">Movements</string>
     <string name="report_empty">No movements in this range.</string>
+    <string name="action_export">Export</string>
+    <string name="report_csv_header_type">Type</string>
 
     <string name="alerts_empty">No low-stock or out-of-stock products right now.</string>
     <string name="stat_total_products">Products</string>
