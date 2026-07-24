@@ -3,7 +3,8 @@ import { useAuth } from "../auth/AuthContext";
 
 const navItems = [
   { to: "/", label: "Panel", end: true },
-  { to: "/products", label: "Ürünler", end: false }
+  { to: "/products", label: "Ürünler", end: false },
+  { to: "/categories", label: "Kategoriler", end: false }
 ];
 
 export function AppLayout() {

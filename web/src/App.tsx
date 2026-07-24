@@ -6,6 +6,7 @@ import { DashboardPage } from "./pages/DashboardPage";
 import { ProductsPage } from "./pages/ProductsPage";
 import { ProductFormPage } from "./pages/ProductFormPage";
 import { ProductDetailPage } from "./pages/ProductDetailPage";
+import { CategoriesPage } from "./pages/CategoriesPage";
 import "./App.css";
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
         <Route path="/products/new" element={<ProductFormPage mode="add" />} />
         <Route path="/products/:id" element={<ProductDetailPage />} />
         <Route path="/products/:id/edit" element={<ProductFormPage mode="edit" />} />
+        <Route path="/categories" element={<CategoriesPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
