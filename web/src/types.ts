@@ -38,6 +38,28 @@ export interface Party {
   email: string;
 }
 
+export type OrderType = "purchase" | "sale";
+export type OrderStatus = "draft" | "approved";
+
+export interface OrderLine {
+  productId: string;
+  quantity: number;
+}
+
+export interface Order {
+  id: string;
+  date: { seconds: number; nanoseconds: number } | null;
+  invoiceNumber: string;
+  receiptNumber: string;
+  type: OrderType;
+  partyId: string;
+  status: OrderStatus;
+  lines: OrderLine[];
+  userId: string;
+  createdAt: { seconds: number; nanoseconds: number } | null;
+  approvedAt: { seconds: number; nanoseconds: number } | null;
+}
+
 export interface Movement {
   id: string;
   productId: string;

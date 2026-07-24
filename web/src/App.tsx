@@ -8,6 +8,9 @@ import { ProductFormPage } from "./pages/ProductFormPage";
 import { ProductDetailPage } from "./pages/ProductDetailPage";
 import { CategoriesPage } from "./pages/CategoriesPage";
 import { CompaniesPage } from "./pages/CompaniesPage";
+import { OrdersPage } from "./pages/OrdersPage";
+import { OrderFormPage } from "./pages/OrderFormPage";
+import { OrderDetailPage } from "./pages/OrderDetailPage";
 import "./App.css";
 
 function App() {
@@ -28,6 +31,9 @@ function App() {
         <Route path="/products/:id/edit" element={<ProductFormPage mode="edit" />} />
         <Route path="/categories" element={<CategoriesPage />} />
         <Route path="/companies" element={<CompaniesPage />} />
+        <Route path="/orders" element={<OrdersPage />} />
+        <Route path="/orders/new" element={<OrderFormPage />} />
+        <Route path="/orders/:id" element={<OrderDetailPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
