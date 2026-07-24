@@ -1,7 +1,11 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import { useAuth } from "./auth/AuthContext";
+import { AppLayout } from "./layout/AppLayout";
 import { LoginPage } from "./pages/LoginPage";
 import { DashboardPage } from "./pages/DashboardPage";
+import { ProductsPage } from "./pages/ProductsPage";
+import { ProductFormPage } from "./pages/ProductFormPage";
+import { ProductDetailPage } from "./pages/ProductDetailPage";
 import "./App.css";
 
 function App() {
@@ -14,7 +18,13 @@ function App() {
   return (
     <Routes>
       <Route path="/login" element={user ? <Navigate to="/" replace /> : <LoginPage />} />
-      <Route path="/" element={user ? <DashboardPage /> : <Navigate to="/login" replace />} />
+      <Route element={user ? <AppLayout /> : <Navigate to="/login" replace />}>
+        <Route path="/" element={<DashboardPage />} />
+        <Route path="/products" element={<ProductsPage />} />
+        <Route path="/products/new" element={<ProductFormPage mode="add" />} />
+        <Route path="/products/:id" element={<ProductDetailPage />} />
+        <Route path="/products/:id/edit" element={<ProductFormPage mode="edit" />} />
+      </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

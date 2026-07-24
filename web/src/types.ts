@@ -22,3 +22,21 @@ export interface Organization {
   subscriptionPlan: string;
   subscriptionExpiry: string | null;
 }
+
+export interface Category {
+  id: string;
+  name: string;
+  sortOrder: number;
+}
+
+export interface Movement {
+  id: string;
+  productId: string;
+  type: "in" | "out";
+  quantity: number;
+  partyId: string;
+  orderId: string;
+  userId: string;
+  timestamp: { seconds: number; nanoseconds: number } | null;
+}
+
