@@ -242,9 +242,6 @@ languages are translated:
 - CSV / Excel import-export
 - Spanish, French, German translations
 - iOS port
-- Web dashboard/portal — same Firebase backend (Firestore + Auth + rules)
-  would serve a web frontend too, but it's a from-scratch UI build (no
-  screens shared with the Android app). Only after Android has traction.
 
 ## Local setup (first run)
 
@@ -339,6 +336,31 @@ Bump `versionCode` (and `versionName` if it's a user-visible version bump)
 in `app/build.gradle.kts`, `./gradlew bundleRelease`, upload the AAB via
 Play Console. Consider a staged rollout (10% → 50% → 100%) for anything
 riskier than a copy change.
+
+## Web app (`web/`)
+
+Started 2026-07-24 — a separate frontend in the same repo, sharing the exact
+same Firebase project (Firestore + Auth) as the Android app. An account
+created on one platform signs in and sees live, synced data on the other;
+there is no separate backend or API, both clients talk to Firestore
+directly under the same security rules.
+
+Stack: Vite + React + TypeScript, `firebase` JS SDK, React Router. The
+Firebase web config in `web/src/firebase.ts` is committed directly (not
+gitignored like `google-services.json`) — a web API key isn't a secret, it's
+visible in any browser's network tab regardless, and access is governed by
+Firestore rules, not by hiding this file.
+
+`web/src/auth/AuthContext.tsx`'s `signUp` deliberately mirrors
+`FirebaseAuthRepository.signUp` on Android field-for-field (same
+`organizations/{uid}` + `members/{uid}` batch write) so an account made on
+web is indistinguishable from one made on mobile.
+
+Current scope: sign up/in, and a Dashboard reading
+`organizations/{orgId}/products` live via `onSnapshot` (product count,
+low-stock, out-of-stock, product list). Categories, Companies, Orders,
+Reports, Settings, and product add/edit don't exist on web yet — see
+`web/README.md`. Run it with `cd web && npm install && npm run dev`.
 
 ## Working with this repo
 

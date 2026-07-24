@@ -1,0 +1,37 @@
+:root {
+  --paper-background: #F4F6F8;
+  --paper-surface: #FFFFFF;
+  --paper-text: #1F2933;
+  --paper-muted: #788492;
+  --paper-border: #E1E6EA;
+  --paper-accent: #3B4B8C;
+  --stock-good: #2F855A;
+  --stock-warn: #B7791F;
+  --stock-bad: #C53030;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--paper-background);
+  color: var(--paper-text);
+  font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+button,
+input {
+  font-family: inherit;
+}
+
+a {
+  color: var(--paper-accent);
+}
