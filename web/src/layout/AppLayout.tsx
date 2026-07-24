@@ -7,7 +7,8 @@ const navItems = [
   { to: "/categories", label: "Kategoriler", end: false },
   { to: "/companies", label: "Firmalar", end: false },
   { to: "/orders", label: "Siparişler", end: false },
-  { to: "/reports", label: "Raporlar", end: false }
+  { to: "/reports", label: "Raporlar", end: false },
+  { to: "/settings", label: "Ayarlar", end: false }
 ];
 
 export function AppLayout() {

@@ -1,12 +1,14 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import {
   createUserWithEmailAndPassword,
+  EmailAuthProvider,
   onAuthStateChanged,
+  reauthenticateWithCredential,
   signInWithEmailAndPassword,
   signOut as firebaseSignOut,
   type User
 } from "firebase/auth";
-import { doc, writeBatch } from "firebase/firestore";
+import { collection, doc, getDocs, writeBatch, type CollectionReference } from "firebase/firestore";
 import { auth, db } from "../firebase";
 
 interface AuthContextValue {
@@ -16,6 +18,7 @@ interface AuthContextValue {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, businessName: string) => Promise<void>;
   signOut: () => Promise<void>;
+  deleteAccount: (password: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -58,13 +61,52 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await firebaseSignOut(auth);
   }
 
+  async function deleteCollection(collectionRef: CollectionReference) {
+    const snapshot = await getDocs(collectionRef);
+    if (snapshot.empty) return;
+    const docs = snapshot.docs;
+    for (let i = 0; i < docs.length; i += 450) {
+      const batch = writeBatch(db);
+      docs.slice(i, i + 450).forEach((d) => batch.delete(d.ref));
+      await batch.commit();
+    }
+  }
+
+  // Mirrors FirebaseAuthRepository.deleteAccount on Android exactly:
+  // re-authenticate, delete every Firestore collection under the org in
+  // batches, delete the org doc, then delete the Auth user itself.
+  async function deleteAccount(password: string) {
+    const current = auth.currentUser;
+    if (!current || !current.email) throw new Error("No signed-in user.");
+
+    const credential = EmailAuthProvider.credential(current.email, password);
+    await reauthenticateWithCredential(current, credential);
+
+    const orgId = current.uid;
+    const orgRef = doc(db, "organizations", orgId);
+
+    await deleteCollection(collection(orgRef, "products"));
+    await deleteCollection(collection(orgRef, "categories"));
+    await deleteCollection(collection(orgRef, "parties"));
+    await deleteCollection(collection(orgRef, "orders"));
+    await deleteCollection(collection(orgRef, "movements"));
+    await deleteCollection(collection(orgRef, "members"));
+
+    const batch = writeBatch(db);
+    batch.delete(orgRef);
+    await batch.commit();
+
+    await current.delete();
+  }
+
   const value: AuthContextValue = {
     user,
     orgId: user?.uid ?? null,
     loading,
     signIn,
     signUp,
-    signOut
+    signOut,
+    deleteAccount
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
