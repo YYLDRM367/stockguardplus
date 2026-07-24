@@ -354,25 +354,42 @@ Firestore rules, not by hiding this file.
 `web/src/auth/AuthContext.tsx`'s `signUp` deliberately mirrors
 `FirebaseAuthRepository.signUp` on Android field-for-field (same
 `organizations/{uid}` + `members/{uid}` batch write) so an account made on
-web is indistinguishable from one made on mobile.
+web is indistinguishable from one made on mobile. `deleteAccount` in the
+same file mirrors `FirebaseAuthRepository.deleteAccount` just as closely:
+re-authenticate with password, batch-delete every Firestore collection
+under the org, delete the org doc, then delete the Auth user.
 
-Current scope: sign up/in, and a Dashboard reading
-`organizations/{orgId}/products` live via `onSnapshot` (product count,
-low-stock, out-of-stock, product list). Categories, Companies, Orders,
-Reports, Settings, and product add/edit don't exist on web yet — see
-`web/README.md`. Run it locally with `cd web && npm install && npm run dev`.
+Feature parity as of 2026-07-24 (built in this order, per the user's
+request): Ürünler (Products, incl. add/edit/search/category filter),
+Kategoriler (add/rename/delete, deleting reassigns affected products to
+`categoryId=""` in one batch — same as `FirebaseCategoryRepository` on
+Android), Firmalar (Companies — add/delete only, no rename, matching
+Android), Siparişler (Orders — Purchase/Sale tabs, multi-line draft
+creation, an approve action running one client-side `runTransaction` that
+updates every line's product quantity and writes a matching Movement,
+rejecting the whole approval if a sale line would go below zero — mirrors
+`FirebaseOrderRepository.approveOrder`), Raporlar (quick/custom date range
++ type/company/product filters + totals + CSV download via a Blob/anchor,
+simpler than Android's FileProvider share-sheet since a browser can just
+trigger a direct download), and Ayarlar (profile email + delete account).
+Barcode scanning is intentionally not built for web. Google Sign-In,
+multi-language UI, and dark theme also don't exist on web yet — none have
+been requested. Run it locally with `cd web && npm install && npm run dev`.
 
 **Live at https://stockguardplus.web.app** (Firebase Hosting, free tier —
 no custom domain needed unless/until wanted later, it can be attached to
-this same Hosting site anytime without touching any code). Deployed via
-`firebase deploy --only hosting` from `web/` after `npm run build`; since
-this dev machine can't do an interactive `firebase login` (see the
-`firestore.rules` note above for why), deploys instead authenticate with a
-temporary service account key set as `GOOGLE_APPLICATION_CREDENTIALS` —
-generate one from Firebase Console → Project settings → Service accounts,
-delete it after the deploy finishes. `web/firebase.json` rewrites every
-path to `/index.html` so React Router's client-side routes don't 404 on a
-direct/refreshed load.
+this same Hosting site anytime without touching any code) — but as of
+2026-07-24 the deployed build only has Products; Categories through
+Settings are committed and pushed to GitHub but not yet deployed, at the
+user's explicit request to batch the redeploy until the end rather than
+redeploy after every feature. Deploy via `firebase deploy --only hosting`
+from `web/` after `npm run build`; since this dev machine can't do an
+interactive `firebase login` (see the `firestore.rules` note above for
+why), deploys instead authenticate with a temporary service account key
+set as `GOOGLE_APPLICATION_CREDENTIALS` — generate one from Firebase
+Console → Project settings → Service accounts, delete it after the deploy
+finishes. `web/firebase.json` rewrites every path to `/index.html` so
+React Router's client-side routes don't 404 on a direct/refreshed load.
 
 ## Working with this repo
 
