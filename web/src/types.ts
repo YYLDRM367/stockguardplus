@@ -29,6 +29,15 @@ export interface Category {
   sortOrder: number;
 }
 
+export interface Party {
+  id: string;
+  name: string;
+  address: string;
+  phone1: string;
+  phone2: string;
+  email: string;
+}
+
 export interface Movement {
   id: string;
   productId: string;
