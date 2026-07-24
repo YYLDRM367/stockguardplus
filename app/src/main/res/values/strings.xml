@@ -109,6 +109,10 @@
     <string name="language_turkish">Turkish</string>
     <string name="language_english">English</string>
 
+    <string name="field_theme">Theme</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+
     <string name="order_tab_purchase">Purchase</string>
     <string name="order_tab_sale">Sale</string>
     <string name="orders_empty">No orders yet. Tap + to create one.</string>

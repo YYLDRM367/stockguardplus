@@ -109,6 +109,10 @@
     <string name="language_turkish">Türkçe</string>
     <string name="language_english">İngilizce</string>
 
+    <string name="field_theme">Tema</string>
+    <string name="theme_light">Açık</string>
+    <string name="theme_dark">Koyu</string>
+
     <string name="order_tab_purchase">Satın Alma</string>
     <string name="order_tab_sale">Satış</string>
     <string name="orders_empty">Henüz sipariş yok. Eklemek için + simgesine dokun.</string>

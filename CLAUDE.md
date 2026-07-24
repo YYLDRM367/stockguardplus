@@ -134,11 +134,28 @@ Colors:
 | Warn | `#B7791F` | low stock |
 | Bad | `#C53030` | out of stock |
 
+**Dark theme** (added 2026-07-19): same token names, inverted for low-light
+legibility — Background `#15171B`, Surface `#1D2025`, Text `#EAECEF`, Muted
+`#8B93A0`, Border `#2E3238`, Accent `#7C8BC4` (lightened so it still passes
+contrast on a dark ground), Good `#4FAE72`, Warn `#D9A548`, Bad `#E2635F`.
+User picks System/Light/Dark in Settings (`ThemePreferences`, mirrors
+`LocalePreferences`); unlike the language picker this needs no
+`activity.recreate()` — colors are a `CompositionLocal`
+(`LocalStockGuardPalette`) that recomposes instantly. The existing
+`PaperBackground`/`PaperSurface`/etc. top-level `val`s were converted to
+`@Composable` getter properties reading from that CompositionLocal, so every
+screen that already referenced them as plain `Color` values kept working
+unchanged — only `ui/theme/Color.kt` and `Theme.kt` needed to change.
+
 Shape/type: 6dp corner radius, 1.5dp borders (bumped from the original 1dp
 hairline 2026-07-18 — the row cards across Products/Orders/Reports/
 Dashboard/Alerts read too faint at 1dp), no gradients, generous whitespace.
 Typeface is the system default (Roboto) — don't introduce a custom font.
 Quantities/SKUs use tabular figures wherever digits line up in a column.
+Product name and quantity in the Products list row are `FontWeight.SemiBold`
+(bumped 2026-07-19 at the user's request — the regular weight read too light
+against the row's other text; they may revert this later, so don't remove
+the old plain-weight option's context from history).
 
 ## MVP scope
 

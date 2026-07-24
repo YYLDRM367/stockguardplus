@@ -39,6 +39,12 @@ private val languageOptions = listOf(
     "en" to R.string.language_english
 )
 
+private val themeOptions = listOf(
+    null to R.string.language_system,
+    "light" to R.string.theme_light,
+    "dark" to R.string.theme_dark
+)
+
 @Composable
 fun SettingsScreen(
     onManageCategories: () -> Unit,
@@ -47,13 +53,18 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val languageTag by viewModel.languageTag.collectAsState()
+    val themeMode by viewModel.themeMode.collectAsState()
     val deleteAccountState by viewModel.deleteAccountState.collectAsState()
     var showLanguageDialog by remember { mutableStateOf(false) }
+    var showThemeDialog by remember { mutableStateOf(false) }
     var showDeleteAccountDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
     val currentLanguageLabel = stringResource(
         languageOptions.find { it.first == languageTag }?.second ?: R.string.language_system
+    )
+    val currentThemeLabel = stringResource(
+        themeOptions.find { it.first == themeMode }?.second ?: R.string.language_system
     )
 
     LaunchedEffect(deleteAccountState) {
@@ -79,6 +90,11 @@ fun SettingsScreen(
                 headlineContent = { Text(stringResource(R.string.field_language)) },
                 supportingContent = { Text(currentLanguageLabel) },
                 modifier = Modifier.clickable { showLanguageDialog = true }
+            )
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.field_theme)) },
+                supportingContent = { Text(currentThemeLabel) },
+                modifier = Modifier.clickable { showThemeDialog = true }
             )
             ListItem(
                 headlineContent = { Text(stringResource(R.string.screen_categories)) },
@@ -133,6 +149,38 @@ fun SettingsScreen(
             },
             confirmButton = {
                 TextButton(onClick = { showLanguageDialog = false }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            }
+        )
+    }
+
+    if (showThemeDialog) {
+        AlertDialog(
+            onDismissRequest = { showThemeDialog = false },
+            title = { Text(stringResource(R.string.field_theme)) },
+            text = {
+                Column {
+                    themeOptions.forEach { (mode, labelRes) ->
+                        val selected = mode == themeMode
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .selectable(selected = selected) {
+                                    viewModel.setThemeMode(mode)
+                                    showThemeDialog = false
+                                }
+                        ) {
+                            ListItem(
+                                headlineContent = { Text(stringResource(labelRes)) },
+                                leadingContent = { RadioButton(selected = selected, onClick = null) }
+                            )
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showThemeDialog = false }) {
                     Text(stringResource(R.string.action_cancel))
                 }
             }

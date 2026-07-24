@@ -5,14 +5,21 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import com.stockguardplus.app.data.local.LocalePreferences
+import com.stockguardplus.app.data.local.ThemePreferences
 import com.stockguardplus.app.ui.navigation.StockGuardNavHost
 import com.stockguardplus.app.ui.theme.StockGuardPlusTheme
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Locale
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var themePreferences: ThemePreferences
 
     override fun attachBaseContext(newBase: Context) {
         val languageTag = LocalePreferences.readLanguageTag(newBase)
@@ -30,7 +37,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            StockGuardPlusTheme {
+            val themeMode by themePreferences.themeMode.collectAsState()
+            StockGuardPlusTheme(themeMode = themeMode) {
                 StockGuardNavHost()
             }
         }
