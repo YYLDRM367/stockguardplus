@@ -360,7 +360,19 @@ Current scope: sign up/in, and a Dashboard reading
 `organizations/{orgId}/products` live via `onSnapshot` (product count,
 low-stock, out-of-stock, product list). Categories, Companies, Orders,
 Reports, Settings, and product add/edit don't exist on web yet — see
-`web/README.md`. Run it with `cd web && npm install && npm run dev`.
+`web/README.md`. Run it locally with `cd web && npm install && npm run dev`.
+
+**Live at https://stockguardplus.web.app** (Firebase Hosting, free tier —
+no custom domain needed unless/until wanted later, it can be attached to
+this same Hosting site anytime without touching any code). Deployed via
+`firebase deploy --only hosting` from `web/` after `npm run build`; since
+this dev machine can't do an interactive `firebase login` (see the
+`firestore.rules` note above for why), deploys instead authenticate with a
+temporary service account key set as `GOOGLE_APPLICATION_CREDENTIALS` —
+generate one from Firebase Console → Project settings → Service accounts,
+delete it after the deploy finishes. `web/firebase.json` rewrites every
+path to `/index.html` so React Router's client-side routes don't 404 on a
+direct/refreshed load.
 
 ## Working with this repo
 
