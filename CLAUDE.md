@@ -378,11 +378,9 @@ been requested. Run it locally with `cd web && npm install && npm run dev`.
 
 **Live at https://stockguardplus.web.app** (Firebase Hosting, free tier —
 no custom domain needed unless/until wanted later, it can be attached to
-this same Hosting site anytime without touching any code) — but as of
-2026-07-24 the deployed build only has Products; Categories through
-Settings are committed and pushed to GitHub but not yet deployed, at the
-user's explicit request to batch the redeploy until the end rather than
-redeploy after every feature. Deploy via `firebase deploy --only hosting`
+this same Hosting site anytime without touching any code) — as of
+2026-07-26 all 6 features above (Ürünler through Ayarlar) are deployed and
+live, verified end to end. Deploy via `firebase deploy --only hosting`
 from `web/` after `npm run build`; since this dev machine can't do an
 interactive `firebase login` (see the `firestore.rules` note above for
 why), deploys instead authenticate with a temporary service account key
