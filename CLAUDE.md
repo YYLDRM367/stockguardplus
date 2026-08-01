@@ -278,12 +278,27 @@ Android purchase flow + paywall → web read-only status display → testing →
 Play Console submission) is written up in a durable artifact the user can
 reference; ask the user for the link if picking this up fresh rather than
 re-deriving the plan from scratch. Current status: Faz 1 (Play Console
-product/plan/trial setup) and half of Faz 2 (Firestore schema +
-`firestore.rules`) are done. Remaining Faz 2 work: deploy the updated rules
-(needs a fresh service account key, same flow as every other
-`firestore.rules` deploy in this project). Not started: Cloud Functions,
-Android `BillingRepository`/paywall UI, web status display, testing, Play
-Console monetization submission declarations.
+product/plan/trial setup) and Faz 2 (Firestore schema + `firestore.rules`,
+deployed) are done. Faz 3 (Cloud Functions) is in progress: `functions/`
+now has `verifyPurchase` (HTTPS callable, called by the Android app right
+after a purchase) and `handleRtdn` (Pub/Sub-triggered, listens for Play's
+Real-time Developer Notifications on a topic named
+`play-subscriptions-rtdn`) — both call a shared helper that re-fetches
+the purchase's current truth from the Play Developer API
+(`purchases.subscriptionsv2.get`) rather than trusting notification
+payloads. **Not yet deployed** — needs three things the user has to do in
+Play Console / Google Cloud Console first (enable the Google Play Android
+Developer API, grant the Cloud Functions runtime service account
+(`stockguardplus@appspot.gserviceaccount.com`, since these are 1st-gen
+functions) financial-data access in Play Console's API access page, and
+create the `play-subscriptions-rtdn` Pub/Sub topic + wire it in Play
+Console's monetization setup), then a deploy using a temporary
+broader-privilege (Editor-role) service account key — the narrower
+`firebase.sdkAdminServiceAgent` key used for Hosting/Rules deploys lacks
+the Cloud Build/Artifact Registry/Functions permissions a Functions
+deploy needs. Not started: Android `BillingRepository`/paywall UI, web
+status display, testing, Play Console monetization submission
+declarations.
 
 ## Roadmap / deferred (do not build until asked)
 
