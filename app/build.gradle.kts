@@ -28,8 +28,8 @@ android {
         applicationId = "com.stockguardplus.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 3
-        versionName = "0.1.2"
+        versionCode = 5
+        versionName = "0.2.1"
     }
 
     signingConfigs {
@@ -101,4 +101,6 @@ dependencies {
     implementation(libs.camerax.lifecycle)
     implementation(libs.camerax.view)
     implementation(libs.mlkit.barcode.scanning)
+
+    implementation(libs.billing.ktx)
 }
