@@ -6,7 +6,19 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /organizations/{orgId} {
-      allow read, write: if request.auth != null && request.auth.uid == orgId;
+      allow read: if request.auth != null && request.auth.uid == orgId;
+      allow create: if request.auth != null && request.auth.uid == orgId;
+
+      // Subscription fields are written only by Cloud Functions (Admin SDK,
+      // which bypasses these rules entirely) after verifying a Play Billing
+      // purchase — the client can create the doc with their initial default
+      // values but can never change them directly, otherwise anyone could
+      // grant themselves a subscription by writing to their own org doc.
+      allow update: if request.auth != null && request.auth.uid == orgId &&
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+          'subscriptionStatus', 'subscriptionPlan', 'subscriptionExpiry',
+          'subscriptionPurchaseToken', 'subscriptionUpdatedAt'
+        ]);
 
       match /{document=**} {
         allow read, write: if request.auth != null && request.auth.uid == orgId;

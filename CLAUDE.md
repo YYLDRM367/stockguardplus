@@ -58,7 +58,17 @@ Everything is scoped under an organization (`orgId`) from day one, even
 though v1 ships single-user per business — retrofitting multi-tenancy later
 is expensive, doing it now is nearly free.
 
-- `organizations/{orgId}` — name, language, subscription state (plan, expiry)
+- `organizations/{orgId}` — name, language, subscription state:
+  `subscriptionStatus` (`trial`/`active`/`grace_period`/`expired`/`canceled`),
+  `subscriptionPlan` (`monthly`/`quarterly`/`yearly`/`null`),
+  `subscriptionExpiry` (Timestamp, current period end),
+  `subscriptionPurchaseToken` (Play Billing purchase token, used to
+  re-verify/look up the purchase), `subscriptionUpdatedAt` (Timestamp).
+  These 5 fields are set at doc creation with default values (`trial`-less
+  defaults — no field yet until a purchase happens) but after that are
+  **only writable by Cloud Functions** (Admin SDK, which bypasses
+  `firestore.rules`) — see "Subscriptions / billing" below.
+  `firestore.rules` blocks the client from touching them on `update`.
 - `organizations/{orgId}/members/{userId}` — role (`owner`/`employee`); only
   `owner` is used in v1, schema is ready for team invites later
 
@@ -227,6 +237,53 @@ languages are translated:
 - All numbers, dates, and currency go through `Locale`-aware formatters
   (`NumberFormat`, `DateFormat`) — never hand-build separators.
 - Default language follows device locale; user can override it in Settings.
+
+## Subscriptions / billing
+
+Started 2026-08-01. Decided model: **no free tier** — every account starts a
+paid subscription right after sign-up, with a 14-day free trial built into
+the subscription itself via Google Play Billing's own trial offer (so the
+user's card is captured by Google Play up front; no app-side "trial without
+a card" logic to build or to abuse). Three plans, one Play Console
+subscription product with three base plans:
+
+- Product ID: `stockguardplus_premium83`
+- Base plan IDs: `monthly`, `quarterly`, `yearly` — each with a 14-day free
+  trial offer phase configured in Play Console (Faz 1, done 2026-08-01).
+
+This is the first feature in the project that needs a server component —
+until now both the Android app and the web app talked to Firestore directly
+with no backend. A client can't be trusted to write its own
+"I'm subscribed" flag (anyone could edit their own org doc otherwise), and
+Google reports subscription lifecycle events (renewal, cancellation, payment
+failure) via server-to-server Real-time Developer Notifications that only a
+backend can receive. So this requires Cloud Functions (Firebase Blaze plan)
+for the first time: one callable Function the client calls right after a
+purchase to verify the purchase token against the Play Developer API and
+write `organizations/{orgId}`'s subscription fields, and one Pub/Sub-
+triggered Function listening for RTDN events to keep that state correct
+even when the app isn't open. `firestore.rules` already blocks the client
+from writing those 5 fields directly (see "Data model" above) — the Cloud
+Functions use the Admin SDK, which bypasses rules, so they're the only
+writer.
+
+Billing Library dependency (`com.android.billingclient:billing-ktx`) was
+added to `app/build.gradle.kts` 2026-08-01 purely to unblock Play Console —
+it refused to let a subscription product be created until an uploaded
+build declared the `com.android.vending.BILLING` permission, which this
+dependency adds via manifest merging. No purchase-flow code exists yet.
+
+Full phased plan (Play Console setup → data model → Cloud Functions →
+Android purchase flow + paywall → web read-only status display → testing →
+Play Console submission) is written up in a durable artifact the user can
+reference; ask the user for the link if picking this up fresh rather than
+re-deriving the plan from scratch. Current status: Faz 1 (Play Console
+product/plan/trial setup) and half of Faz 2 (Firestore schema +
+`firestore.rules`) are done. Remaining Faz 2 work: deploy the updated rules
+(needs a fresh service account key, same flow as every other
+`firestore.rules` deploy in this project). Not started: Cloud Functions,
+Android `BillingRepository`/paywall UI, web status display, testing, Play
+Console monetization submission declarations.
 
 ## Roadmap / deferred (do not build until asked)
 
