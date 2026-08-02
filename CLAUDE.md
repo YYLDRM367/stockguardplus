@@ -297,10 +297,27 @@ Registry/Functions permissions a Functions deploy needs, and even the
 Editor-role key couldn't grant the final `allUsers` → Cloud Functions
 Invoker IAM binding on `verifyPurchase` (Editor excludes `setIamPolicy`
 calls by design) — the user did that one step manually via Google Cloud
-Console using their own (Owner-level) account. Not started: Android
-`BillingRepository`/paywall UI (Faz 4), web status display (Faz 5),
-testing (Faz 6), Play Console monetization submission declarations
-(Faz 7).
+Console using their own (Owner-level) account. Faz 4 (Android purchase
+flow + paywall) is also done as of 2026-08-02: `BillingRepository`
+(`PlayBillingRepository`) wraps `BillingClient` to query the 3 base plans'
+offers, launch the purchase flow, and acknowledge purchases, then calls
+the `verifyPurchase` Cloud Function rather than trusting the client's own
+view of entitlement; `OrganizationRepository` observes
+`organizations/{orgId}`'s subscription fields live. Every signed-in user
+now lands on a `Paywall` screen first (`NavStartViewModel` always routes
+there when `currentOrgId != null`) — it checks `hasActiveAccess`
+(trial/active/grace_period) and bounces straight to Dashboard if already
+covered, otherwise shows the 3 plan cards; sign-up routes here too, since
+there's no free tier. Settings has an "Aboneliğim" section (status,
+renewal/trial-end date, a link to Play's subscription management page).
+The old `subscriptionPlan: "free"` default was removed from both
+`FirebaseAuthRepository.signUp` and web's `AuthContext.signUp` — an org
+now has no entitlement at all until `verifyPurchase` writes real fields.
+Not started: web status display (Faz 5 — web still has no way to show
+subscription state, since Play Billing purchases are Android-only),
+end-to-end testing with license testers (Faz 6 — not yet confirmed license
+testers are added in Play Console), Play Console monetization submission
+declarations (Faz 7).
 
 ## Roadmap / deferred (do not build until asked)
 
