@@ -278,27 +278,29 @@ Android purchase flow + paywall → web read-only status display → testing →
 Play Console submission) is written up in a durable artifact the user can
 reference; ask the user for the link if picking this up fresh rather than
 re-deriving the plan from scratch. Current status: Faz 1 (Play Console
-product/plan/trial setup) and Faz 2 (Firestore schema + `firestore.rules`,
-deployed) are done. Faz 3 (Cloud Functions) is in progress: `functions/`
-now has `verifyPurchase` (HTTPS callable, called by the Android app right
-after a purchase) and `handleRtdn` (Pub/Sub-triggered, listens for Play's
-Real-time Developer Notifications on a topic named
-`play-subscriptions-rtdn`) — both call a shared helper that re-fetches
+product/plan/trial setup), Faz 2 (Firestore schema + `firestore.rules`,
+deployed), and Faz 3 (Cloud Functions) are all done. `functions/` has
+`verifyPurchase` (HTTPS callable, called by the Android app right after a
+purchase — live at
+`https://us-central1-stockguardplus.cloudfunctions.net/verifyPurchase`)
+and `handleRtdn` (Pub/Sub-triggered on topic `play-subscriptions-rtdn`,
+which Play Console's monetization setup is now wired to send Real-time
+Developer Notifications to) — both call a shared helper that re-fetches
 the purchase's current truth from the Play Developer API
 (`purchases.subscriptionsv2.get`) rather than trusting notification
-payloads. **Not yet deployed** — needs three things the user has to do in
-Play Console / Google Cloud Console first (enable the Google Play Android
-Developer API, grant the Cloud Functions runtime service account
-(`stockguardplus@appspot.gserviceaccount.com`, since these are 1st-gen
-functions) financial-data access in Play Console's API access page, and
-create the `play-subscriptions-rtdn` Pub/Sub topic + wire it in Play
-Console's monetization setup), then a deploy using a temporary
-broader-privilege (Editor-role) service account key — the narrower
-`firebase.sdkAdminServiceAgent` key used for Hosting/Rules deploys lacks
-the Cloud Build/Artifact Registry/Functions permissions a Functions
-deploy needs. Not started: Android `BillingRepository`/paywall UI, web
-status display, testing, Play Console monetization submission
-declarations.
+payloads. Both functions run as `stockguardplus@appspot.gserviceaccount.com`
+(1st-gen default), which now has Play Console financial-data access and
+Pub/Sub publish rights wired to it. Deployed 2026-08-02 using a temporary
+Editor-role service account key — the narrower `firebase.sdkAdminServiceAgent`
+key used for Hosting/Rules deploys lacks the Cloud Build/Artifact
+Registry/Functions permissions a Functions deploy needs, and even the
+Editor-role key couldn't grant the final `allUsers` → Cloud Functions
+Invoker IAM binding on `verifyPurchase` (Editor excludes `setIamPolicy`
+calls by design) — the user did that one step manually via Google Cloud
+Console using their own (Owner-level) account. Not started: Android
+`BillingRepository`/paywall UI (Faz 4), web status display (Faz 5),
+testing (Faz 6), Play Console monetization submission declarations
+(Faz 7).
 
 ## Roadmap / deferred (do not build until asked)
 
