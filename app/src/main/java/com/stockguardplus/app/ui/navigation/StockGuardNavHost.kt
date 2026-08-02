@@ -37,6 +37,7 @@ import com.stockguardplus.app.ui.screens.companies.CompaniesScreen
 import com.stockguardplus.app.ui.screens.dashboard.DashboardScreen
 import com.stockguardplus.app.ui.screens.onboarding.OnboardingScreen
 import com.stockguardplus.app.ui.screens.orders.CreateOrderScreen
+import com.stockguardplus.app.ui.screens.paywall.PaywallScreen
 import com.stockguardplus.app.ui.screens.orders.OrderDetailScreen
 import com.stockguardplus.app.ui.screens.orders.OrdersScreen
 import com.stockguardplus.app.ui.screens.products.AddEditProductScreen
@@ -98,8 +99,17 @@ fun StockGuardNavHost(navStartViewModel: NavStartViewModel = hiltViewModel()) {
             composable(Screen.Onboarding.route) {
                 OnboardingScreen(
                     onSignedIn = {
-                        navController.navigate(Screen.Dashboard.route) {
+                        navController.navigate(Screen.Paywall.route) {
                             popUpTo(Screen.Onboarding.route) { inclusive = true }
+                        }
+                    }
+                )
+            }
+            composable(Screen.Paywall.route) {
+                PaywallScreen(
+                    onSubscribed = {
+                        navController.navigate(Screen.Dashboard.route) {
+                            popUpTo(Screen.Paywall.route) { inclusive = true }
                         }
                     }
                 )

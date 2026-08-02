@@ -28,11 +28,12 @@ class FirebaseAuthRepository @Inject constructor(
         val orgRef = firestore.collection("organizations").document(uid)
         val memberRef = orgRef.collection("members").document(uid)
 
+        // Subscription fields are deliberately absent here — there's no free
+        // tier, so an org has no entitlement at all until verifyPurchase
+        // (Cloud Function) writes subscriptionStatus after a real purchase.
         val org = mapOf(
             "name" to businessName,
-            "language" to Locale.getDefault().language,
-            "subscriptionPlan" to "free",
-            "subscriptionExpiry" to null
+            "language" to Locale.getDefault().language
         )
         val member = mapOf("role" to "owner")
 

@@ -10,6 +10,7 @@ fun decodeRouteParam(value: String) = URLDecoder.decode(value, "UTF-8")
 
 sealed class Screen(val route: String) {
     data object Onboarding : Screen("onboarding")
+    data object Paywall : Screen("paywall")
     data object Dashboard : Screen("dashboard")
     data object Products : Screen("products")
     data object Categories : Screen("categories")

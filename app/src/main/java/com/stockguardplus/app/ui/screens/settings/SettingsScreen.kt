@@ -1,6 +1,8 @@
 package com.stockguardplus.app.ui.screens.settings
 
 import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,8 +32,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.stockguardplus.app.R
+import com.stockguardplus.app.data.model.SubscriptionStatus
 import com.stockguardplus.app.ui.theme.PaperMuted
 import com.stockguardplus.app.ui.theme.StockBad
+import java.text.DateFormat
+import java.util.Locale
 
 private val languageOptions = listOf(
     null to R.string.language_system,
@@ -54,6 +59,7 @@ fun SettingsScreen(
 ) {
     val languageTag by viewModel.languageTag.collectAsState()
     val themeMode by viewModel.themeMode.collectAsState()
+    val organization by viewModel.organization.collectAsState()
     val deleteAccountState by viewModel.deleteAccountState.collectAsState()
     var showLanguageDialog by remember { mutableStateOf(false) }
     var showThemeDialog by remember { mutableStateOf(false) }
@@ -83,6 +89,38 @@ fun SettingsScreen(
             ListItem(
                 headlineContent = { Text(stringResource(R.string.field_account_email)) },
                 supportingContent = { Text(viewModel.currentUserEmail.orEmpty()) }
+            )
+            HorizontalDivider()
+
+            SectionLabel(stringResource(R.string.screen_subscription))
+            val dateFormatter = remember { DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault()) }
+            val statusLabelRes = when (organization?.status) {
+                SubscriptionStatus.TRIAL -> R.string.subscription_status_trial
+                SubscriptionStatus.ACTIVE -> R.string.subscription_status_active
+                SubscriptionStatus.GRACE_PERIOD -> R.string.subscription_status_grace_period
+                SubscriptionStatus.CANCELED -> R.string.subscription_status_canceled
+                SubscriptionStatus.EXPIRED, null -> R.string.subscription_status_expired
+            }
+            val expiryDate = organization?.subscriptionExpiry?.toDate()
+            val expiryLabel = expiryDate?.let {
+                val dateRes = if (organization?.status == SubscriptionStatus.TRIAL) {
+                    R.string.subscription_trial_ends_on
+                } else {
+                    R.string.subscription_renews_on
+                }
+                stringResource(dateRes, dateFormatter.format(it))
+            }
+            ListItem(
+                headlineContent = { Text(stringResource(statusLabelRes)) },
+                supportingContent = expiryLabel?.let { label -> { Text(label) } }
+            )
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.action_manage_subscription)) },
+                modifier = Modifier.clickable {
+                    context.startActivity(
+                        Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/account/subscriptions"))
+                    )
+                }
             )
             HorizontalDivider()
 

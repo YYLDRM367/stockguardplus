@@ -141,4 +141,27 @@
     <string name="confirm_delete_account_title">Delete account</string>
     <string name="confirm_delete_account_message">This permanently deletes your account and all business data — products, orders, companies, categories. This can\'t be undone. Enter your password to confirm.</string>
     <string name="error_delete_account_failed">Could not delete the account. Check your password and try again.</string>
+
+    <string name="screen_paywall">Choose a plan</string>
+    <string name="paywall_subtitle">Every plan starts with a 14-day free trial. Cancel anytime before it ends and you won\'t be charged.</string>
+    <string name="paywall_trial_badge">%1$d days free</string>
+    <string name="paywall_plan_monthly">Monthly</string>
+    <string name="paywall_plan_quarterly">3 months</string>
+    <string name="paywall_plan_yearly">Yearly</string>
+    <string name="paywall_select_plan">Start free trial</string>
+    <string name="paywall_verifying">Confirming your subscription…</string>
+    <string name="error_paywall_load_failed">Could not load plans. Check your connection and try again.</string>
+    <string name="error_paywall_purchase_failed">Purchase failed. Please try again.</string>
+    <string name="error_paywall_verify_failed">Could not confirm the purchase. Please try again — your payment is safe.</string>
+    <string name="action_retry">Retry</string>
+
+    <string name="screen_subscription">Subscription</string>
+    <string name="subscription_status_trial">Free trial</string>
+    <string name="subscription_status_active">Active</string>
+    <string name="subscription_status_grace_period">Payment issue — retrying</string>
+    <string name="subscription_status_expired">Expired</string>
+    <string name="subscription_status_canceled">Canceled</string>
+    <string name="subscription_renews_on">Renews %1$s</string>
+    <string name="subscription_trial_ends_on">Trial ends %1$s</string>
+    <string name="action_manage_subscription">Manage subscription</string>
 </resources>

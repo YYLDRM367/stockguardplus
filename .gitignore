@@ -25,3 +25,4 @@ google-services.json
 
 # Cloud Functions
 functions/node_modules/
+firebase-debug.log

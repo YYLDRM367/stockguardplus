@@ -141,4 +141,27 @@
     <string name="confirm_delete_account_title">Hesabı sil</string>
     <string name="confirm_delete_account_message">Bu işlem hesabını ve tüm işletme verilerini (ürünler, siparişler, firmalar, kategoriler) kalıcı olarak siler. Geri alınamaz. Onaylamak için şifreni gir.</string>
     <string name="error_delete_account_failed">Hesap silinemedi. Şifreni kontrol edip tekrar dene.</string>
+
+    <string name="screen_paywall">Bir plan seç</string>
+    <string name="paywall_subtitle">Her plan 14 günlük ücretsiz deneme ile başlar. Deneme bitmeden iptal edersen ücret yansıtılmaz.</string>
+    <string name="paywall_trial_badge">%1$d gün ücretsiz</string>
+    <string name="paywall_plan_monthly">Aylık</string>
+    <string name="paywall_plan_quarterly">3 aylık</string>
+    <string name="paywall_plan_yearly">Yıllık</string>
+    <string name="paywall_select_plan">Ücretsiz denemeyi başlat</string>
+    <string name="paywall_verifying">Aboneliğin onaylanıyor…</string>
+    <string name="error_paywall_load_failed">Planlar yüklenemedi. Bağlantını kontrol edip tekrar dene.</string>
+    <string name="error_paywall_purchase_failed">Satın alma başarısız oldu. Lütfen tekrar dene.</string>
+    <string name="error_paywall_verify_failed">Satın alma onaylanamadı. Lütfen tekrar dene — ödemen güvende.</string>
+    <string name="action_retry">Tekrar dene</string>
+
+    <string name="screen_subscription">Abonelik</string>
+    <string name="subscription_status_trial">Ücretsiz deneme</string>
+    <string name="subscription_status_active">Aktif</string>
+    <string name="subscription_status_grace_period">Ödeme sorunu — tekrar deneniyor</string>
+    <string name="subscription_status_expired">Süresi doldu</string>
+    <string name="subscription_status_canceled">İptal edildi</string>
+    <string name="subscription_renews_on">%1$s tarihinde yenilenecek</string>
+    <string name="subscription_trial_ends_on">Deneme %1$s tarihinde bitiyor</string>
+    <string name="action_manage_subscription">Aboneliği yönet</string>
 </resources>

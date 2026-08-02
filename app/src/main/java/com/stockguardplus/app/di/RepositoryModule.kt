@@ -1,6 +1,7 @@
 package com.stockguardplus.app.di
 
 import com.stockguardplus.app.data.repository.AuthRepository
+import com.stockguardplus.app.data.repository.BillingRepository
 import com.stockguardplus.app.data.repository.CategoryRepository
 import com.stockguardplus.app.data.repository.CompanyRepository
 import com.stockguardplus.app.data.repository.FirebaseAuthRepository
@@ -8,10 +9,15 @@ import com.stockguardplus.app.data.repository.FirebaseCategoryRepository
 import com.stockguardplus.app.data.repository.FirebaseCompanyRepository
 import com.stockguardplus.app.data.repository.FirebaseMovementRepository
 import com.stockguardplus.app.data.repository.FirebaseOrderRepository
+import com.stockguardplus.app.data.repository.FirebaseOrganizationRepository
 import com.stockguardplus.app.data.repository.FirebaseProductRepository
+import com.stockguardplus.app.data.repository.FirebaseSubscriptionRepository
 import com.stockguardplus.app.data.repository.MovementRepository
 import com.stockguardplus.app.data.repository.OrderRepository
+import com.stockguardplus.app.data.repository.OrganizationRepository
+import com.stockguardplus.app.data.repository.PlayBillingRepository
 import com.stockguardplus.app.data.repository.ProductRepository
+import com.stockguardplus.app.data.repository.SubscriptionRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -45,4 +51,16 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindOrderRepository(impl: FirebaseOrderRepository): OrderRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindOrganizationRepository(impl: FirebaseOrganizationRepository): OrganizationRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindBillingRepository(impl: PlayBillingRepository): BillingRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindSubscriptionRepository(impl: FirebaseSubscriptionRepository): SubscriptionRepository
 }

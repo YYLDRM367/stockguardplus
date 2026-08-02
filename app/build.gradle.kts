@@ -94,6 +94,7 @@ dependencies {
     implementation(libs.firebase.messaging.ktx)
     implementation(libs.firebase.analytics.ktx)
     implementation(libs.firebase.crashlytics.ktx)
+    implementation(libs.firebase.functions.ktx)
     implementation(libs.kotlinx.coroutines.play.services)
 
     implementation(libs.camerax.core)

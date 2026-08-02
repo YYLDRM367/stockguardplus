@@ -46,12 +46,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const credential = await createUserWithEmailAndPassword(auth, email, password);
     const uid = credential.user.uid;
 
+    // Subscription fields are deliberately absent — there's no free tier,
+    // so an org has no entitlement until verifyPurchase (Cloud Function)
+    // writes subscriptionStatus after a real Play Billing purchase.
     const batch = writeBatch(db);
     batch.set(doc(db, "organizations", uid), {
       name: businessName,
-      language: navigator.language.split("-")[0] || "en",
-      subscriptionPlan: "free",
-      subscriptionExpiry: null
+      language: navigator.language.split("-")[0] || "en"
     });
     batch.set(doc(db, "organizations", uid, "members", uid), { role: "owner" });
     await batch.commit();
