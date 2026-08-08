@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { useAuth } from "./auth/AuthContext";
 import { AppLayout } from "./layout/AppLayout";
 import { LoginPage } from "./pages/LoginPage";
+import { SubscriptionRequiredPage } from "./pages/SubscriptionRequiredPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { ProductsPage } from "./pages/ProductsPage";
 import { ProductFormPage } from "./pages/ProductFormPage";
@@ -13,19 +14,32 @@ import { OrderFormPage } from "./pages/OrderFormPage";
 import { OrderDetailPage } from "./pages/OrderDetailPage";
 import { ReportsPage } from "./pages/ReportsPage";
 import { SettingsPage } from "./pages/SettingsPage";
+import { hasActiveAccess } from "./types";
 import "./App.css";
 
 function App() {
-  const { user, loading } = useAuth();
+  const { user, loading, organization, orgLoading } = useAuth();
 
-  if (loading) {
+  if (loading || (user && orgLoading)) {
     return <p className="empty-state">Yükleniyor...</p>;
   }
+
+  const entitled = user !== null && hasActiveAccess(organization);
 
   return (
     <Routes>
       <Route path="/login" element={user ? <Navigate to="/" replace /> : <LoginPage />} />
-      <Route element={user ? <AppLayout /> : <Navigate to="/login" replace />}>
+      <Route
+        element={
+          !user ? (
+            <Navigate to="/login" replace />
+          ) : entitled ? (
+            <AppLayout />
+          ) : (
+            <SubscriptionRequiredPage />
+          )
+        }
+      >
         <Route path="/" element={<DashboardPage />} />
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/products/new" element={<ProductFormPage mode="add" />} />

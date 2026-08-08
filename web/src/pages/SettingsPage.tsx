@@ -1,8 +1,22 @@
 import { useState, type FormEvent } from "react";
 import { useAuth } from "../auth/AuthContext";
 
+const statusLabels: Record<string, string> = {
+  trial: "Ücretsiz deneme",
+  active: "Aktif",
+  grace_period: "Ödeme sorunu — tekrar deneniyor",
+  expired: "Süresi doldu",
+  canceled: "İptal edildi"
+};
+
+const planLabels: Record<string, string> = {
+  monthly: "Aylık",
+  quarterly: "3 aylık",
+  yearly: "Yıllık"
+};
+
 export function SettingsPage() {
-  const { user, deleteAccount } = useAuth();
+  const { user, organization, deleteAccount } = useAuth();
   const [confirming, setConfirming] = useState(false);
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -34,6 +48,35 @@ export function SettingsPage() {
           <div className="value">{user?.email}</div>
         </div>
       </div>
+
+      <h2 style={{ fontSize: "1rem", marginBottom: 10 }}>Aboneliğim</h2>
+      <div className="detail-grid" style={{ marginBottom: 24 }}>
+        <div className="detail-field">
+          <div className="label">Durum</div>
+          <div className="value">
+            {organization?.subscriptionStatus ? statusLabels[organization.subscriptionStatus] : "Aktif değil"}
+          </div>
+        </div>
+        {organization?.subscriptionPlan && (
+          <div className="detail-field">
+            <div className="label">Plan</div>
+            <div className="value">{planLabels[organization.subscriptionPlan]}</div>
+          </div>
+        )}
+        {organization?.subscriptionExpiry && (
+          <div className="detail-field">
+            <div className="label">
+              {organization.subscriptionStatus === "trial" ? "Deneme bitiş" : "Yenilenme"}
+            </div>
+            <div className="value">
+              {new Date(organization.subscriptionExpiry.seconds * 1000).toLocaleDateString("tr-TR")}
+            </div>
+          </div>
+        )}
+      </div>
+      <p className="field-hint" style={{ marginBottom: 24 }}>
+        Abonelik yalnızca Android uygulaması üzerinden, Google Play ile yönetilir.
+      </p>
 
       <h2 style={{ fontSize: "1rem", marginBottom: 10 }}>Hesabı sil</h2>
       {!confirming ? (

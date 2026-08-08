@@ -16,11 +16,29 @@ export function productStatus(product: Product): StockStatus {
   return "IN_STOCK";
 }
 
+export type SubscriptionStatus = "trial" | "active" | "grace_period" | "expired" | "canceled";
+export type SubscriptionPlan = "monthly" | "quarterly" | "yearly";
+
 export interface Organization {
+  id: string;
   name: string;
   language: string;
-  subscriptionPlan: string;
-  subscriptionExpiry: string | null;
+  subscriptionStatus: SubscriptionStatus | null;
+  subscriptionPlan: SubscriptionPlan | null;
+  subscriptionExpiry: { seconds: number; nanoseconds: number } | null;
+}
+
+// trial/active/grace_period all mean "let the user in" — grace_period is
+// Play's own retry window after a failed renewal payment, access stays on
+// so the user isn't locked out mid-retry. Mirrors Organization.hasActiveAccess
+// on Android exactly.
+export function hasActiveAccess(org: Organization | null): boolean {
+  if (!org) return false;
+  return (
+    org.subscriptionStatus === "trial" ||
+    org.subscriptionStatus === "active" ||
+    org.subscriptionStatus === "grace_period"
+  );
 }
 
 export interface Category {

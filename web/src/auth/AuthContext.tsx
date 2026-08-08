@@ -8,13 +8,16 @@ import {
   signOut as firebaseSignOut,
   type User
 } from "firebase/auth";
-import { collection, doc, getDocs, writeBatch, type CollectionReference } from "firebase/firestore";
+import { collection, doc, getDocs, onSnapshot, writeBatch, type CollectionReference } from "firebase/firestore";
 import { auth, db } from "../firebase";
+import type { Organization } from "../types";
 
 interface AuthContextValue {
   user: User | null;
   orgId: string | null;
   loading: boolean;
+  organization: Organization | null;
+  orgLoading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, businessName: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -26,6 +29,8 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [organization, setOrganization] = useState<Organization | null>(null);
+  const [orgLoading, setOrgLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
@@ -34,6 +39,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
     return unsubscribe;
   }, []);
+
+  // Drives the subscription gate in App.tsx — mirrors
+  // FirebaseOrganizationRepository.observeOrganization on Android.
+  useEffect(() => {
+    if (!user) {
+      setOrganization(null);
+      setOrgLoading(false);
+      return;
+    }
+    setOrgLoading(true);
+    const unsubscribe = onSnapshot(doc(db, "organizations", user.uid), (snapshot) => {
+      setOrganization(snapshot.exists() ? ({ id: snapshot.id, ...(snapshot.data() as Omit<Organization, "id">) }) : null);
+      setOrgLoading(false);
+    });
+    return unsubscribe;
+  }, [user]);
 
   async function signIn(email: string, password: string) {
     await signInWithEmailAndPassword(auth, email, password);
@@ -104,6 +125,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     user,
     orgId: user?.uid ?? null,
     loading,
+    organization,
+    orgLoading,
     signIn,
     signUp,
     signOut,
