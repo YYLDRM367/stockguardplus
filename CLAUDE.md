@@ -313,11 +313,20 @@ renewal/trial-end date, a link to Play's subscription management page).
 The old `subscriptionPlan: "free"` default was removed from both
 `FirebaseAuthRepository.signUp` and web's `AuthContext.signUp` — an org
 now has no entitlement at all until `verifyPurchase` writes real fields.
-Not started: web status display (Faz 5 — web still has no way to show
-subscription state, since Play Billing purchases are Android-only),
-end-to-end testing with license testers (Faz 6 — not yet confirmed license
-testers are added in Play Console), Play Console monetization submission
-declarations (Faz 7).
+Faz 5 (web) is also done: `AuthContext` observes `organizations/{orgId}`
+live (`organization`/`orgLoading`), `hasActiveAccess()` in `types.ts`
+mirrors the Android extension property exactly, and `App.tsx` gates every
+authenticated route on it — not entitled renders
+`SubscriptionRequiredPage` (points back to the Android app, since Play
+Billing purchases can't start on web) instead of the app shell. Settings
+has a matching read-only "Aboneliğim" section. **Not yet deployed to
+Hosting** — deliberately held back, since deploying it now would lock out
+every existing web user (no one has completed a real purchase yet to
+re-test against), so it's queued to go out together with/after Faz 6
+testing confirms the Android purchase flow actually grants access. Not
+started: end-to-end testing with license testers (Faz 6 — not yet
+confirmed license testers are added in Play Console), Play Console
+monetization submission declarations (Faz 7).
 
 ## Roadmap / deferred (do not build until asked)
 
