@@ -16,7 +16,8 @@ data class Movement(
     val partyId: String = "",
     val orderId: String = "",
     val userId: String = "",
-    @ServerTimestamp val timestamp: Timestamp? = null
+    @ServerTimestamp val timestamp: Timestamp? = null,
+    val isDemo: Boolean = false
 ) {
     val movementType: MovementType
         get() = if (type == "out") MovementType.OUT else MovementType.IN

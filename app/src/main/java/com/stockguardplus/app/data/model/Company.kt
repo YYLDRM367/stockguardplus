@@ -8,5 +8,6 @@ data class Company(
     val address: String = "",
     val phone1: String = "",
     val phone2: String = "",
-    val email: String = ""
+    val email: String = "",
+    val isDemo: Boolean = false
 )

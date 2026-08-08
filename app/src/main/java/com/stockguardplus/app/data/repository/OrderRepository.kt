@@ -16,7 +16,8 @@ interface OrderRepository {
         invoiceNumber: String,
         receiptNumber: String,
         partyId: String,
-        lines: List<OrderLine>
+        lines: List<OrderLine>,
+        isDemo: Boolean = false
     ): String
 
     suspend fun approveOrder(orderId: String)

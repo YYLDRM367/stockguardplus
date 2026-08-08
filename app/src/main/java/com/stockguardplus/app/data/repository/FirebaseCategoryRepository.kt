@@ -37,12 +37,13 @@ class FirebaseCategoryRepository @Inject constructor(
         }
     }
 
-    override suspend fun addCategory(name: String): String {
+    override suspend fun addCategory(name: String, isDemo: Boolean): String {
         val orgId = requireNotNull(authRepository.currentOrgId) { "Cannot add a category while signed out." }
 
         val data = mapOf(
             "name" to name,
-            "sortOrder" to System.currentTimeMillis()
+            "sortOrder" to System.currentTimeMillis(),
+            "isDemo" to isDemo
         )
 
         val reference = firestore.collection("organizations")

@@ -8,14 +8,19 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -26,6 +31,7 @@ import com.stockguardplus.app.data.model.Movement
 import com.stockguardplus.app.data.model.MovementType
 import com.stockguardplus.app.data.model.StockStatus
 import com.stockguardplus.app.ui.components.StatCard
+import com.stockguardplus.app.ui.theme.PaperAccent
 import com.stockguardplus.app.ui.theme.PaperBorder
 import com.stockguardplus.app.ui.theme.PaperMuted
 import com.stockguardplus.app.ui.theme.PaperSurface
@@ -47,6 +53,9 @@ fun DashboardScreen(
     val products by viewModel.products.collectAsState()
     val recentMovements by viewModel.recentMovements.collectAsState()
     val companies by viewModel.companies.collectAsState()
+    val showDemoPrompt by viewModel.showDemoPrompt.collectAsState()
+    val hasDemoData by viewModel.hasDemoData.collectAsState()
+    var bannerDismissed by rememberSaveable { mutableStateOf(false) }
     val lowStockCount = products.count { it.status == StockStatus.LOW_STOCK }
     val outOfStockCount = products.count { it.status == StockStatus.OUT_OF_STOCK }
 
@@ -66,6 +75,13 @@ fun DashboardScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            if (hasDemoData && !bannerDismissed) {
+                DemoDataBanner(
+                    onClear = viewModel::clearDemoData,
+                    onDismiss = { bannerDismissed = true }
+                )
+            }
+
             Row(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.fillMaxWidth()
@@ -114,6 +130,46 @@ fun DashboardScreen(
                         )
                     }
                 }
+            }
+        }
+    }
+
+    if (showDemoPrompt) {
+        AlertDialog(
+            onDismissRequest = {},
+            title = { Text(stringResource(R.string.demo_prompt_title)) },
+            text = { Text(stringResource(R.string.demo_prompt_message)) },
+            confirmButton = {
+                TextButton(onClick = viewModel::loadDemoData) {
+                    Text(stringResource(R.string.demo_prompt_load))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = viewModel::skipDemoData) {
+                    Text(stringResource(R.string.demo_prompt_skip))
+                }
+            }
+        )
+    }
+}
+
+@Composable
+private fun DemoDataBanner(onClear: () -> Unit, onDismiss: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(PaperSurface, MaterialTheme.shapes.small)
+            .border(1.5.dp, PaperAccent, MaterialTheme.shapes.small)
+            .padding(12.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(text = stringResource(R.string.demo_banner_text), style = MaterialTheme.typography.bodyMedium)
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            TextButton(onClick = onClear) {
+                Text(stringResource(R.string.action_clear_demo_data))
+            }
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.action_dismiss))
             }
         }
     }

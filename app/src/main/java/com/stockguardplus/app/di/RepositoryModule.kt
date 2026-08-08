@@ -4,7 +4,9 @@ import com.stockguardplus.app.data.repository.AuthRepository
 import com.stockguardplus.app.data.repository.BillingRepository
 import com.stockguardplus.app.data.repository.CategoryRepository
 import com.stockguardplus.app.data.repository.CompanyRepository
+import com.stockguardplus.app.data.repository.DemoDataRepository
 import com.stockguardplus.app.data.repository.FirebaseAuthRepository
+import com.stockguardplus.app.data.repository.FirebaseDemoDataRepository
 import com.stockguardplus.app.data.repository.FirebaseCategoryRepository
 import com.stockguardplus.app.data.repository.FirebaseCompanyRepository
 import com.stockguardplus.app.data.repository.FirebaseMovementRepository
@@ -63,4 +65,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindSubscriptionRepository(impl: FirebaseSubscriptionRepository): SubscriptionRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindDemoDataRepository(impl: FirebaseDemoDataRepository): DemoDataRepository
 }

@@ -10,7 +10,7 @@ interface ProductRepository {
 
     suspend fun findProductByBarcode(barcode: String): Product?
 
-    suspend fun addProduct(product: Product)
+    suspend fun addProduct(product: Product): String
 
     suspend fun updateProductDetails(
         productId: String,

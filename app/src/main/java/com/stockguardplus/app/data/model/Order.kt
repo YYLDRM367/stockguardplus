@@ -38,7 +38,8 @@ data class Order(
     val lines: List<OrderLine> = emptyList(),
     val userId: String = "",
     @ServerTimestamp val createdAt: Timestamp? = null,
-    val approvedAt: Timestamp? = null
+    val approvedAt: Timestamp? = null,
+    val isDemo: Boolean = false
 ) {
     val orderType: OrderType get() = OrderType.fromValue(type)
     val orderStatus: OrderStatus get() = OrderStatus.fromValue(status)

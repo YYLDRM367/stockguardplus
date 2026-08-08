@@ -116,7 +116,7 @@ class FirebaseProductRepository @Inject constructor(
             .await()
     }
 
-    override suspend fun addProduct(product: Product) {
+    override suspend fun addProduct(product: Product): String {
         val orgId = requireNotNull(authRepository.currentOrgId) { "Cannot add a product while signed out." }
 
         val data = mapOf(
@@ -125,13 +125,16 @@ class FirebaseProductRepository @Inject constructor(
             "barcode" to product.barcode,
             "quantity" to product.quantity,
             "reorderPoint" to product.reorderPoint,
-            "categoryId" to product.categoryId
+            "categoryId" to product.categoryId,
+            "isDemo" to product.isDemo
         )
 
-        firestore.collection("organizations")
+        val reference = firestore.collection("organizations")
             .document(orgId)
             .collection("products")
             .add(data)
             .await()
+
+        return reference.id
     }
 }

@@ -45,7 +45,8 @@ class FirebaseCompanyRepository @Inject constructor(
             "address" to company.address,
             "phone1" to company.phone1,
             "phone2" to company.phone2,
-            "email" to company.email
+            "email" to company.email,
+            "isDemo" to company.isDemo
         )
 
         val reference = firestore.collection("organizations")

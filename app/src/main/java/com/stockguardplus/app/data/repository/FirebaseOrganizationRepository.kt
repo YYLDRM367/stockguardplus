@@ -6,6 +6,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -30,5 +31,14 @@ class FirebaseOrganizationRepository @Inject constructor(
                 }
             awaitClose { registration.remove() }
         }
+    }
+
+    override suspend fun markDemoDataOffered() {
+        val orgId = requireNotNull(authRepository.currentOrgId) { "Cannot update organization while signed out." }
+
+        firestore.collection("organizations")
+            .document(orgId)
+            .update("demoDataOffered", true)
+            .await()
     }
 }

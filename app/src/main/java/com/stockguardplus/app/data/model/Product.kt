@@ -9,7 +9,8 @@ data class Product(
     val barcode: String = "",
     val quantity: Int = 0,
     val reorderPoint: Int = 0,
-    val categoryId: String = ""
+    val categoryId: String = "",
+    val isDemo: Boolean = false
 ) {
     val status: StockStatus
         get() = when {

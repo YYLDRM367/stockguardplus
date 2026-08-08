@@ -60,10 +60,12 @@ fun SettingsScreen(
     val languageTag by viewModel.languageTag.collectAsState()
     val themeMode by viewModel.themeMode.collectAsState()
     val organization by viewModel.organization.collectAsState()
+    val hasDemoData by viewModel.hasDemoData.collectAsState()
     val deleteAccountState by viewModel.deleteAccountState.collectAsState()
     var showLanguageDialog by remember { mutableStateOf(false) }
     var showThemeDialog by remember { mutableStateOf(false) }
     var showDeleteAccountDialog by remember { mutableStateOf(false) }
+    var showClearDemoDataDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
     val currentLanguageLabel = stringResource(
@@ -142,6 +144,12 @@ fun SettingsScreen(
                 headlineContent = { Text(stringResource(R.string.screen_companies)) },
                 modifier = Modifier.clickable(onClick = onManageCompanies)
             )
+            if (hasDemoData) {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.action_clear_demo_data)) },
+                    modifier = Modifier.clickable { showClearDemoDataDialog = true }
+                )
+            }
             ListItem(
                 headlineContent = { Text(stringResource(R.string.action_sign_out)) },
                 modifier = Modifier.clickable {
@@ -219,6 +227,27 @@ fun SettingsScreen(
             },
             confirmButton = {
                 TextButton(onClick = { showThemeDialog = false }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            }
+        )
+    }
+
+    if (showClearDemoDataDialog) {
+        AlertDialog(
+            onDismissRequest = { showClearDemoDataDialog = false },
+            title = { Text(stringResource(R.string.confirm_clear_demo_data_title)) },
+            text = { Text(stringResource(R.string.confirm_clear_demo_data_message)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    showClearDemoDataDialog = false
+                    viewModel.clearDemoData()
+                }) {
+                    Text(stringResource(R.string.action_clear_demo_data), color = StockBad)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showClearDemoDataDialog = false }) {
                     Text(stringResource(R.string.action_cancel))
                 }
             }

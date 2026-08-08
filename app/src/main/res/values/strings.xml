@@ -166,4 +166,14 @@
     <string name="subscription_renews_on">Renews %1$s</string>
     <string name="subscription_trial_ends_on">Trial ends %1$s</string>
     <string name="action_manage_subscription">Manage subscription</string>
+
+    <string name="demo_prompt_title">Explore with sample data?</string>
+    <string name="demo_prompt_message">Load a sample set of categories, products, a company, and stock movements to see how StockGuard+ works — you can clear it anytime.</string>
+    <string name="demo_prompt_load">Load sample data</string>
+    <string name="demo_prompt_skip">Start empty</string>
+    <string name="demo_banner_text">You\'re viewing sample data.</string>
+    <string name="action_clear_demo_data">Clear sample data</string>
+    <string name="action_dismiss">Dismiss</string>
+    <string name="confirm_clear_demo_data_title">Clear sample data</string>
+    <string name="confirm_clear_demo_data_message">This removes every sample category, product, company, and order — nothing you\'ve entered yourself will be touched. This can\'t be undone.</string>
 </resources>

@@ -21,7 +21,8 @@ data class Organization(
     val language: String = "",
     val subscriptionStatus: String? = null,
     val subscriptionPlan: String? = null,
-    val subscriptionExpiry: Timestamp? = null
+    val subscriptionExpiry: Timestamp? = null,
+    val demoDataOffered: Boolean = false
 ) {
     val status: SubscriptionStatus? get() = SubscriptionStatus.fromValue(subscriptionStatus)
 

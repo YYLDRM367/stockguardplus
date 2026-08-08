@@ -5,4 +5,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface OrganizationRepository {
     fun observeOrganization(): Flow<Organization?>
+
+    suspend fun markDemoDataOffered()
 }

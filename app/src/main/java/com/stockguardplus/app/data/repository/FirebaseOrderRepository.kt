@@ -68,7 +68,8 @@ class FirebaseOrderRepository @Inject constructor(
         invoiceNumber: String,
         receiptNumber: String,
         partyId: String,
-        lines: List<OrderLine>
+        lines: List<OrderLine>,
+        isDemo: Boolean
     ): String {
         val orgId = requireNotNull(authRepository.currentOrgId) { "Cannot create an order while signed out." }
 
@@ -81,7 +82,8 @@ class FirebaseOrderRepository @Inject constructor(
             "status" to OrderStatus.DRAFT.value,
             "lines" to lines.map { mapOf("productId" to it.productId, "quantity" to it.quantity) },
             "userId" to orgId,
-            "createdAt" to FieldValue.serverTimestamp()
+            "createdAt" to FieldValue.serverTimestamp(),
+            "isDemo" to isDemo
         )
 
         val reference = firestore.collection("organizations")
@@ -107,6 +109,7 @@ class FirebaseOrderRepository @Inject constructor(
 
             val type = OrderType.fromValue(orderSnapshot.getString("type") ?: OrderType.PURCHASE.value)
             val partyId = orderSnapshot.getString("partyId").orEmpty()
+            val isDemo = orderSnapshot.getBoolean("isDemo") ?: false
 
             @Suppress("UNCHECKED_CAST")
             val rawLines = orderSnapshot.get("lines") as? List<Map<String, Any>> ?: emptyList()
@@ -145,7 +148,8 @@ class FirebaseOrderRepository @Inject constructor(
                         "partyId" to partyId,
                         "orderId" to orderId,
                         "userId" to orgId,
-                        "timestamp" to FieldValue.serverTimestamp()
+                        "timestamp" to FieldValue.serverTimestamp(),
+                        "isDemo" to isDemo
                     )
                 )
             }

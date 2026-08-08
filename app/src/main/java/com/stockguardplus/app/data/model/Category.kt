@@ -5,5 +5,6 @@ import com.google.firebase.firestore.DocumentId
 data class Category(
     @DocumentId val id: String = "",
     val name: String = "",
-    val sortOrder: Long = 0
+    val sortOrder: Long = 0,
+    val isDemo: Boolean = false
 )

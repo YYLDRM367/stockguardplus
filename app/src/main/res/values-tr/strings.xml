@@ -166,4 +166,14 @@
     <string name="subscription_renews_on">%1$s tarihinde yenilenecek</string>
     <string name="subscription_trial_ends_on">Deneme %1$s tarihinde bitiyor</string>
     <string name="action_manage_subscription">Aboneliği yönet</string>
+
+    <string name="demo_prompt_title">Örnek verilerle keşfetmek ister misin?</string>
+    <string name="demo_prompt_message">StockGuard+\'ın nasıl çalıştığını görmek için örnek kategoriler, ürünler, bir firma ve stok hareketleri yükleyelim — istediğin zaman temizleyebilirsin.</string>
+    <string name="demo_prompt_load">Örnek verileri yükle</string>
+    <string name="demo_prompt_skip">Boş başla</string>
+    <string name="demo_banner_text">Şu an örnek verileri görüntülüyorsun.</string>
+    <string name="action_clear_demo_data">Demo verilerini temizle</string>
+    <string name="action_dismiss">Kapat</string>
+    <string name="confirm_clear_demo_data_title">Demo verilerini temizle</string>
+    <string name="confirm_clear_demo_data_message">Bu işlem tüm örnek kategori, ürün, firma ve siparişleri siler — kendi eklediğin hiçbir veriye dokunulmaz. Geri alınamaz.</string>
 </resources>
