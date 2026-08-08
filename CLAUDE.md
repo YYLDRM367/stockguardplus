@@ -118,6 +118,8 @@ check would block any invited employee.
   Movement history per product is fetched by `productId` only and sorted
   client-side (avoids needing a Firestore composite index for a `productId`
   + `timestamp` query).
+- `products`, `categories`, `parties`, `orders`, and `movements` docs all
+  also carry `isDemo: Boolean` (default `false`) — see "Demo data" below.
 - `organizations/{orgId}/locations/{locationId}` — not implemented yet
   (planned for multi-warehouse, see Roadmap); `quantity` above assumes a
   single implicit location until that lands.
@@ -353,6 +355,42 @@ testing confirms the Android purchase flow actually grants access. Not
 started: end-to-end testing with license testers (Faz 6 — not yet
 confirmed license testers are added in Play Console), Play Console
 monetization submission declarations (Faz 7).
+
+## Demo data
+
+Added 2026-08-08. Every signed-in org whose Dashboard is still empty gets a
+one-time dialog offering to load a sample dataset in the app's active
+language — Turkish or English (`LocalePreferences.languageTag`, falling
+back to device locale; Spanish/French/German aren't translated yet so they
+fall back to English too, see Localization above). The two sets
+(`DemoDataTr`/`DemoDataEn` in `data/demo/DemoDataSet.kt`) are plain Kotlin
+objects, not JSON assets — no parsing dependency needed, and adding a
+future language is one more object + one branch in `demoDataSetFor()`.
+
+`FirebaseDemoDataRepository.seedDemoData()` creates the demo categories,
+products, and one demo company through the existing
+`CategoryRepository`/`ProductRepository`/`CompanyRepository`, then — for
+each product with a nonzero demo quantity — creates and **approves** a real
+purchase order through `OrderRepository`, so quantities and movement
+history come from the same code path a real user's stock does, not a
+number written directly onto the product. Order dates are spread over the
+past ~3 weeks so Reports' date filters have something to show. Every demo
+record (`products`, `categories`, `parties`, `orders`, and the `movements`
+their approval writes) carries `isDemo: Boolean` — `Order`'s `isDemo`
+flows onto its movements automatically inside
+`FirebaseOrderRepository.approveOrder`'s transaction, so a caller can't
+forget to tag one half of the pair.
+
+`clearDemoData()` deletes everything with `isDemo == true` across those 5
+collections (chunked batch delete, same pattern as
+`FirebaseAuthRepository.deleteCollection`) — it can never touch anything
+the user entered themselves, since the query itself is scoped to
+`isDemo == true`. Reachable from a dismissible Dashboard banner (shown
+whenever any product has `isDemo == true`) and from a Settings row (shown
+under the same condition). `organizations/{orgId}.demoDataOffered`
+(client-writable, not one of the locked subscription fields) tracks
+whether the initial dialog has already been shown so it never reappears
+once answered either way.
 
 ## Roadmap / deferred (do not build until asked)
 
