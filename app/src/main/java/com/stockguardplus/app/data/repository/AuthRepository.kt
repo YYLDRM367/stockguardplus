@@ -9,6 +9,11 @@ interface AuthRepository {
 
     suspend fun signIn(email: String, password: String)
 
+    /** Signs in with a Google ID token from Credential Manager. Creates the
+     * organization/member docs on this account's first sign-in, same as
+     * [signUp] does for email/password. */
+    suspend fun signInWithGoogle(idToken: String)
+
     fun signOut()
 
     suspend fun deleteAccount(password: String)

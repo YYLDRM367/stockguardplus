@@ -44,6 +44,18 @@ class OnboardingViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(isSignUpMode = !_uiState.value.isSignUpMode, errorMessage = null)
     }
 
+    fun signInWithGoogle(idToken: String) {
+        _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
+        viewModelScope.launch {
+            try {
+                authRepository.signInWithGoogle(idToken)
+                _uiState.value = _uiState.value.copy(isLoading = false, isSignedIn = true)
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(isLoading = false, errorMessage = e.message ?: "Something went wrong.")
+            }
+        }
+    }
+
     fun submit() {
         val state = _uiState.value
         if (state.email.isBlank() || state.password.isBlank() || (state.isSignUpMode && state.businessName.isBlank())) {

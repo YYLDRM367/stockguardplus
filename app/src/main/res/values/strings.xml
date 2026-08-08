@@ -9,6 +9,8 @@
     <string name="onboarding_sign_in">Sign in</string>
     <string name="onboarding_toggle_to_sign_in">Already have an account? Sign in</string>
     <string name="onboarding_toggle_to_sign_up">Don\'t have an account? Sign up</string>
+    <string name="onboarding_or">or</string>
+    <string name="onboarding_google_sign_in">Continue with Google</string>
 
     <string name="tab_dashboard">Dashboard</string>
     <string name="tab_products">Products</string>

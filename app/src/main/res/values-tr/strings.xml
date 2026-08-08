@@ -9,6 +9,8 @@
     <string name="onboarding_sign_in">Giriş yap</string>
     <string name="onboarding_toggle_to_sign_in">Zaten hesabın var mı? Giriş yap</string>
     <string name="onboarding_toggle_to_sign_up">Hesabın yok mu? Kayıt ol</string>
+    <string name="onboarding_or">veya</string>
+    <string name="onboarding_google_sign_in">Google ile devam et</string>
 
     <string name="tab_dashboard">Panel</string>
     <string name="tab_products">Ürünler</string>

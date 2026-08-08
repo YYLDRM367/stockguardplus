@@ -104,4 +104,8 @@ dependencies {
     implementation(libs.mlkit.barcode.scanning)
 
     implementation(libs.billing.ktx)
+
+    implementation(libs.credentials)
+    implementation(libs.credentials.play.services.auth)
+    implementation(libs.googleid)
 }

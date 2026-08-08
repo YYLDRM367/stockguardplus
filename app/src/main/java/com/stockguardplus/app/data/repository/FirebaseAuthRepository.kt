@@ -2,6 +2,7 @@ package com.stockguardplus.app.data.repository
 
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
@@ -24,13 +25,34 @@ class FirebaseAuthRepository @Inject constructor(
     override suspend fun signUp(email: String, password: String, businessName: String) {
         val result = auth.createUserWithEmailAndPassword(email, password).await()
         val uid = requireNotNull(result.user?.uid) { "Sign-up succeeded but no user id was returned." }
+        createOrganization(uid, businessName)
+    }
 
+    override suspend fun signIn(email: String, password: String) {
+        auth.signInWithEmailAndPassword(email, password).await()
+    }
+
+    override suspend fun signInWithGoogle(idToken: String) {
+        val credential = GoogleAuthProvider.getCredential(idToken, null)
+        val result = auth.signInWithCredential(credential).await()
+        val user = requireNotNull(result.user) { "Google sign-in succeeded but no user was returned." }
+
+        // Google Sign-In doesn't collect a business name up front like the
+        // email sign-up form does, so a brand-new account falls back to the
+        // Google account's display name — there's no rename UI yet, but the
+        // Firestore field itself isn't otherwise special.
+        if (result.additionalUserInfo?.isNewUser == true) {
+            createOrganization(user.uid, user.displayName ?: user.email.orEmpty())
+        }
+    }
+
+    // Subscription fields are deliberately absent here — there's no free
+    // tier, so an org has no entitlement at all until verifyPurchase
+    // (Cloud Function) writes subscriptionStatus after a real purchase.
+    private suspend fun createOrganization(uid: String, businessName: String) {
         val orgRef = firestore.collection("organizations").document(uid)
         val memberRef = orgRef.collection("members").document(uid)
 
-        // Subscription fields are deliberately absent here — there's no free
-        // tier, so an org has no entitlement at all until verifyPurchase
-        // (Cloud Function) writes subscriptionStatus after a real purchase.
         val org = mapOf(
             "name" to businessName,
             "language" to Locale.getDefault().language
@@ -41,10 +63,6 @@ class FirebaseAuthRepository @Inject constructor(
             batch.set(orgRef, org)
             batch.set(memberRef, member)
         }.await()
-    }
-
-    override suspend fun signIn(email: String, password: String) {
-        auth.signInWithEmailAndPassword(email, password).await()
     }
 
     override fun signOut() {
