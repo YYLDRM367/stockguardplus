@@ -145,7 +145,7 @@
     <string name="error_delete_account_failed">Could not delete the account. Check your password and try again.</string>
 
     <string name="screen_paywall">Choose a plan</string>
-    <string name="paywall_subtitle">Every plan starts with a 14-day free trial. Cancel anytime before it ends and you won\'t be charged.</string>
+    <string name="paywall_subtitle">Every plan starts with a 7-day free trial. Cancel anytime before it ends and you won\'t be charged.</string>
     <string name="paywall_trial_badge">%1$d days free</string>
     <string name="paywall_plan_monthly">Monthly</string>
     <string name="paywall_plan_quarterly">3 months</string>

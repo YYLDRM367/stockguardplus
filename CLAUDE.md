@@ -261,15 +261,21 @@ languages are translated:
 ## Subscriptions / billing
 
 Started 2026-08-01. Decided model: **no free tier** — every account starts a
-paid subscription right after sign-up, with a 14-day free trial built into
+paid subscription right after sign-up, with a 7-day free trial built into
 the subscription itself via Google Play Billing's own trial offer (so the
 user's card is captured by Google Play up front; no app-side "trial without
 a card" logic to build or to abuse). Three plans, one Play Console
 subscription product with three base plans:
 
 - Product ID: `stockguardplus_premium83`
-- Base plan IDs: `monthly`, `quarterly`, `yearly` — each with a 14-day free
-  trial offer phase configured in Play Console (Faz 1, done 2026-08-01).
+- Base plan IDs: `monthly`, `quarterly`, `yearly` — each with a 7-day free
+  trial offer phase configured in Play Console (Faz 1, done 2026-08-01;
+  the `monthly` offer was accidentally left in draft and only activated
+  2026-08-08 — if a build ever shows "Monthly" with no trial badge, check
+  this first). `functions/index.js`'s `TRIAL_DAYS` constant must match
+  this exactly — it infers trial-vs-active status from the subscription's
+  `startTime` since Play's v2 API doesn't expose trial phase directly (see
+  the function's own comment for the full explanation).
 
 This is the first feature in the project that needs a server component —
 until now both the Android app and the web app talked to Firestore directly

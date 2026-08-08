@@ -51,7 +51,11 @@ class PlayBillingRepository @Inject constructor(
 
     private val billingClient = BillingClient.newBuilder(context)
         .setListener(purchasesUpdatedListener)
-        .enablePendingPurchases(PendingPurchasesParams.newBuilder().build())
+        // Billing Library 7.x requires this call even though we only sell
+        // subscriptions, not one-time products — omitting it throws at
+        // BillingClient construction time ("Pending purchases for one-time
+        // products must be supported").
+        .enablePendingPurchases(PendingPurchasesParams.newBuilder().enableOneTimeProducts().build())
         .build()
 
     private suspend fun ensureConnected() {
@@ -108,7 +112,15 @@ class PlayBillingRepository @Inject constructor(
                         productDetails = productDetails
                     )
                 }
-                if (cont.isActive) cont.resume(offers)
+                // A base plan can have more than one offer in Play Console
+                // (e.g. a plain purchase-path entry alongside a promotional
+                // trial offer) — since every plan here should start with a
+                // free trial, collapse to one card per plan, preferring
+                // whichever offer actually has a trial phase.
+                val dedupedOffers = offers
+                    .groupBy { it.plan }
+                    .mapNotNull { (_, offersForPlan) -> offersForPlan.firstOrNull { it.freeTrialDays != null } ?: offersForPlan.firstOrNull() }
+                if (cont.isActive) cont.resume(dedupedOffers)
             }
         }
     }

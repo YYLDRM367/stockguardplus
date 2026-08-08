@@ -6,7 +6,9 @@ admin.initializeApp();
 const db = admin.firestore();
 
 const PACKAGE_NAME = "com.stockguardplus.app";
-const TRIAL_DAYS = 14;
+// Keep in sync with the free trial offer's duration configured on each
+// base plan in Play Console (see CLAUDE.md "Subscriptions / billing").
+const TRIAL_DAYS = 7;
 
 // Keep in sync with the base plan IDs configured in Play Console
 // (stockguardplus_premium83 > monthly / quarterly / yearly — see

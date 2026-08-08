@@ -145,7 +145,7 @@
     <string name="error_delete_account_failed">Hesap silinemedi. Şifreni kontrol edip tekrar dene.</string>
 
     <string name="screen_paywall">Bir plan seç</string>
-    <string name="paywall_subtitle">Her plan 14 günlük ücretsiz deneme ile başlar. Deneme bitmeden iptal edersen ücret yansıtılmaz.</string>
+    <string name="paywall_subtitle">Her plan 7 günlük ücretsiz deneme ile başlar. Deneme bitmeden iptal edersen ücret yansıtılmaz.</string>
     <string name="paywall_trial_badge">%1$d gün ücretsiz</string>
     <string name="paywall_plan_monthly">Aylık</string>
     <string name="paywall_plan_quarterly">3 aylık</string>
