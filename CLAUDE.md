@@ -410,6 +410,17 @@ under the same condition). `organizations/{orgId}.demoDataOffered`
 whether the initial dialog has already been shown so it never reappears
 once answered either way.
 
+**Firestore/Kotlin gotcha hit here (fixed 2026-08-09):** all 5 `isDemo`
+fields need `@get:PropertyName("isDemo")` on the property. Without it,
+Firestore's reflection-based `toObject()` sees Kotlin's generated
+`isDemo()` getter, strips the "is" per Java Bean convention, and looks
+for a document field named `demo` instead — silently deserializing
+`isDemo` back to `false` on every read even though the document field
+(and every write, which uses plain maps with the literal key `"isDemo"`)
+is genuinely `true`. Any *new* `isXxx`-named Boolean field added to a
+Firestore-mapped model needs the same annotation, or it'll silently
+misread the same way.
+
 ## Roadmap / deferred (do not build until asked)
 
 - Multi-location warehouse UI (schema already supports it)
