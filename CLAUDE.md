@@ -331,27 +331,41 @@ flow + paywall) is also done as of 2026-08-02: `BillingRepository`
 offers, launch the purchase flow, and acknowledge purchases, then calls
 the `verifyPurchase` Cloud Function rather than trusting the client's own
 view of entitlement; `OrganizationRepository` observes
-`organizations/{orgId}`'s subscription fields live. Every signed-in user
-now lands on a `Paywall` screen first (`NavStartViewModel` always routes
-there when `currentOrgId != null`) — it checks `hasActiveAccess`
-(trial/active/grace_period) and bounces straight to Dashboard if already
-covered, otherwise shows the 3 plan cards; sign-up routes here too, since
-there's no free tier. Settings has an "Aboneliğim" section (status,
-renewal/trial-end date, a link to Play's subscription management page).
-The old `subscriptionPlan: "free"` default was removed from both
+`organizations/{orgId}`'s subscription fields live.
+
+**Revised 2026-08-09: browsing is free, only writes require a
+subscription.** The original "Paywall first, no free tier" flow (every
+signed-in user forced through Paywall before seeing anything) turned out
+to be the wrong call once real testing started — a brand-new user
+couldn't even see the app or try the demo data before being asked to pay.
+Now `NavStartViewModel` sends signed-in users straight to `Dashboard`;
+`Paywall` is reached only when a write action requires it (or from
+Settings' subscription management link). `SubscriptionGateViewModel`
+(`ui/navigation/`) exposes `hasActiveAccess` and is wired into
+`StockGuardNavHost`, which wraps navigation-triggered write flows (add/
+edit product, create order) directly; screens with in-place writes
+(Categories, Companies, `OrderDetailScreen`'s approve/delete,
+`ProductDetailScreen`'s delete, and the demo-data-clear actions on
+Dashboard/Settings) receive `hasActiveAccess` + `onSubscribeRequired` as
+params and gate themselves the same way, showing a shared
+`SubscriptionRequiredDialog` before routing to Paywall. `PaywallScreen`
+itself still self-checks entitlement and bounces to Dashboard if already
+covered (for sign-up, or a subscribe-then-return flow), but now also has
+a back button and a "Not now — keep exploring" link since it's no longer
+a mandatory dead-end screen. Settings has an "Aboneliğim" section
+(status, renewal/trial-end date, a link to Play's subscription management
+page). The old `subscriptionPlan: "free"` default was removed from both
 `FirebaseAuthRepository.signUp` and web's `AuthContext.signUp` — an org
-now has no entitlement at all until `verifyPurchase` writes real fields.
-Faz 5 (web) is also done: `AuthContext` observes `organizations/{orgId}`
-live (`organization`/`orgLoading`), `hasActiveAccess()` in `types.ts`
-mirrors the Android extension property exactly, and `App.tsx` gates every
-authenticated route on it — not entitled renders
-`SubscriptionRequiredPage` (points back to the Android app, since Play
-Billing purchases can't start on web) instead of the app shell. Settings
-has a matching read-only "Aboneliğim" section. **Not yet deployed to
-Hosting** — deliberately held back, since deploying it now would lock out
-every existing web user (no one has completed a real purchase yet to
-re-test against), so it's queued to go out together with/after Faz 6
-testing confirms the Android purchase flow actually grants access. Not
+now has no entitlement at all until `verifyPurchase` writes real fields;
+that part of the model is unchanged, only *when* the app asks for it.
+
+**Web is now stale relative to this revision** — Faz 5 (web) gates the
+entire authenticated app behind `hasActiveAccess()` in `App.tsx`
+(`SubscriptionRequiredPage` for anyone not entitled), matching the old
+Android "Paywall first" behavior, not the new browse-free model. Revisit
+this together with the deferred web Hosting deploy (see below) — worth
+deciding whether web should also move to a browse-free/gate-on-write
+model before it goes live, so the two platforms behave consistently. Not
 started: end-to-end testing with license testers (Faz 6 — not yet
 confirmed license testers are added in Play Console), Play Console
 monetization submission declarations (Faz 7).
