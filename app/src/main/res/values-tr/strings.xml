@@ -176,4 +176,9 @@
     <string name="action_dismiss">Kapat</string>
     <string name="confirm_clear_demo_data_title">Demo verilerini temizle</string>
     <string name="confirm_clear_demo_data_message">Bu işlem tüm örnek kategori, ürün, firma ve siparişleri siler — kendi eklediğin hiçbir veriye dokunulmaz. Geri alınamaz.</string>
+
+    <string name="subscription_required_title">Devam etmek için abone ol</string>
+    <string name="subscription_required_message">Örnek verileri ücretsiz gezebilirsin. Kendi verini eklemek, düzenlemek veya onaylamak için aktif bir abonelik gerekiyor.</string>
+    <string name="action_subscribe">Abone ol</string>
+    <string name="paywall_continue_with_demo">Şimdi değil — gezmeye devam et</string>
 </resources>

@@ -34,12 +34,22 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.stockguardplus.app.R
 import com.stockguardplus.app.data.model.Category
+import com.stockguardplus.app.ui.components.SubscriptionRequiredDialog
 
 @Composable
-fun CategoriesScreen(viewModel: CategoriesViewModel = hiltViewModel()) {
+fun CategoriesScreen(
+    hasActiveAccess: Boolean,
+    onSubscribeRequired: () -> Unit,
+    viewModel: CategoriesViewModel = hiltViewModel()
+) {
     val categories by viewModel.categories.collectAsState()
     val newCategoryName by viewModel.newCategoryName.collectAsState()
     var renamingCategory by remember { mutableStateOf<Category?>(null) }
+    var showSubscriptionDialog by remember { mutableStateOf(false) }
+
+    fun requireSubscription(action: () -> Unit) {
+        if (hasActiveAccess) action() else showSubscriptionDialog = true
+    }
 
     Scaffold(
         topBar = { TopAppBar(title = { Text(stringResource(R.string.screen_categories)) }) }
@@ -62,7 +72,7 @@ fun CategoriesScreen(viewModel: CategoriesViewModel = hiltViewModel()) {
                     singleLine = true,
                     modifier = Modifier.weight(1f)
                 )
-                Button(onClick = viewModel::addCategory) {
+                Button(onClick = { requireSubscription(viewModel::addCategory) }) {
                     Text(stringResource(R.string.action_add))
                 }
             }
@@ -76,10 +86,10 @@ fun CategoriesScreen(viewModel: CategoriesViewModel = hiltViewModel()) {
                         headlineContent = { Text(category.name) },
                         trailingContent = {
                             Row {
-                                IconButton(onClick = { renamingCategory = category }) {
+                                IconButton(onClick = { requireSubscription { renamingCategory = category } }) {
                                     Icon(Icons.Filled.Edit, contentDescription = stringResource(R.string.action_rename))
                                 }
-                                IconButton(onClick = { viewModel.deleteCategory(category.id) }) {
+                                IconButton(onClick = { requireSubscription { viewModel.deleteCategory(category.id) } }) {
                                     Icon(Icons.Filled.Delete, contentDescription = stringResource(R.string.action_delete))
                                 }
                             }
@@ -97,6 +107,16 @@ fun CategoriesScreen(viewModel: CategoriesViewModel = hiltViewModel()) {
             onConfirm = { newName ->
                 viewModel.renameCategory(category.id, newName)
                 renamingCategory = null
+            }
+        )
+    }
+
+    if (showSubscriptionDialog) {
+        SubscriptionRequiredDialog(
+            onDismiss = { showSubscriptionDialog = false },
+            onSubscribe = {
+                showSubscriptionDialog = false
+                onSubscribeRequired()
             }
         )
     }

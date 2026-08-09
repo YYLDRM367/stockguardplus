@@ -55,6 +55,8 @@ fun SettingsScreen(
     onManageCategories: () -> Unit,
     onManageCompanies: () -> Unit,
     onSignedOut: () -> Unit,
+    hasActiveAccess: Boolean,
+    onSubscribeRequired: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val languageTag by viewModel.languageTag.collectAsState()
@@ -147,7 +149,9 @@ fun SettingsScreen(
             if (hasDemoData) {
                 ListItem(
                     headlineContent = { Text(stringResource(R.string.action_clear_demo_data)) },
-                    modifier = Modifier.clickable { showClearDemoDataDialog = true }
+                    modifier = Modifier.clickable {
+                        if (hasActiveAccess) showClearDemoDataDialog = true else onSubscribeRequired()
+                    }
                 )
             }
             ListItem(

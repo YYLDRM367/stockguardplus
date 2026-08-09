@@ -37,6 +37,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.stockguardplus.app.R
 import com.stockguardplus.app.data.model.OrderLine
 import com.stockguardplus.app.data.model.OrderStatus
+import com.stockguardplus.app.ui.components.SubscriptionRequiredDialog
 import com.stockguardplus.app.ui.theme.PaperBorder
 import com.stockguardplus.app.ui.theme.PaperMuted
 import com.stockguardplus.app.ui.theme.PaperSurface
@@ -50,6 +51,8 @@ import java.util.Locale
 fun OrderDetailScreen(
     orderId: String,
     onDeleted: () -> Unit,
+    hasActiveAccess: Boolean,
+    onSubscribeRequired: () -> Unit,
     viewModel: OrderDetailViewModel = hiltViewModel()
 ) {
     LaunchedEffect(orderId) { viewModel.load(orderId) }
@@ -63,6 +66,11 @@ fun OrderDetailScreen(
 
     var showApproveDialog by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
+    var showSubscriptionDialog by remember { mutableStateOf(false) }
+
+    fun requireSubscription(action: () -> Unit) {
+        if (hasActiveAccess) action() else showSubscriptionDialog = true
+    }
 
     LaunchedEffect(isDeleted) {
         if (isDeleted) onDeleted()
@@ -77,10 +85,10 @@ fun OrderDetailScreen(
                 title = { Text(formattedDate ?: stringResource(R.string.screen_order_detail)) },
                 actions = {
                     if (order?.orderStatus == OrderStatus.DRAFT) {
-                        IconButton(onClick = { showApproveDialog = true }) {
+                        IconButton(onClick = { requireSubscription { showApproveDialog = true } }) {
                             Icon(Icons.Filled.Check, contentDescription = stringResource(R.string.action_approve_order))
                         }
-                        IconButton(onClick = { showDeleteDialog = true }) {
+                        IconButton(onClick = { requireSubscription { showDeleteDialog = true } }) {
                             Icon(Icons.Filled.Delete, contentDescription = stringResource(R.string.action_delete))
                         }
                     }
@@ -190,6 +198,16 @@ fun OrderDetailScreen(
                 TextButton(onClick = { showDeleteDialog = false }) {
                     Text(stringResource(R.string.action_cancel))
                 }
+            }
+        )
+    }
+
+    if (showSubscriptionDialog) {
+        SubscriptionRequiredDialog(
+            onDismiss = { showSubscriptionDialog = false },
+            onSubscribe = {
+                showSubscriptionDialog = false
+                onSubscribeRequired()
             }
         )
     }

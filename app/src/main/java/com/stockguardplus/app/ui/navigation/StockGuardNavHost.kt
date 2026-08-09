@@ -16,6 +16,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -47,6 +50,7 @@ import com.stockguardplus.app.ui.screens.products.ProductListScreen
 import com.stockguardplus.app.ui.screens.scanner.BarcodeLookupScreen
 import com.stockguardplus.app.ui.screens.scanner.BarcodeScannerScreen
 import com.stockguardplus.app.ui.screens.settings.SettingsScreen
+import com.stockguardplus.app.ui.components.SubscriptionRequiredDialog
 
 private data class BottomTab(val screen: Screen, val icon: ImageVector, val labelRes: Int)
 
@@ -59,10 +63,24 @@ private val bottomTabs = listOf(
 )
 
 @Composable
-fun StockGuardNavHost(navStartViewModel: NavStartViewModel = hiltViewModel()) {
+fun StockGuardNavHost(
+    navStartViewModel: NavStartViewModel = hiltViewModel(),
+    subscriptionGateViewModel: SubscriptionGateViewModel = hiltViewModel()
+) {
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
+    val hasActiveAccess by subscriptionGateViewModel.hasActiveAccess.collectAsState()
+    var showSubscriptionDialog by remember { mutableStateOf(false) }
+
+    // Browsing (including demo data) is free; any real write goes through
+    // this first. Screens that navigate to a write flow (add/edit product,
+    // create order) get wrapped here; screens with in-place writes
+    // (Categories, Companies, approve/delete order, delete product) receive
+    // hasActiveAccess + onSubscribeRequired directly and gate themselves.
+    fun requireSubscription(action: () -> Unit) {
+        if (hasActiveAccess) action() else showSubscriptionDialog = true
+    }
 
     val showBottomBar = bottomTabs.any { tab ->
         currentDestination?.hierarchy?.any { it.route == tab.screen.route } == true
@@ -99,7 +117,7 @@ fun StockGuardNavHost(navStartViewModel: NavStartViewModel = hiltViewModel()) {
             composable(Screen.Onboarding.route) {
                 OnboardingScreen(
                     onSignedIn = {
-                        navController.navigate(Screen.Paywall.route) {
+                        navController.navigate(Screen.Dashboard.route) {
                             popUpTo(Screen.Onboarding.route) { inclusive = true }
                         }
                     }
@@ -111,7 +129,8 @@ fun StockGuardNavHost(navStartViewModel: NavStartViewModel = hiltViewModel()) {
                         navController.navigate(Screen.Dashboard.route) {
                             popUpTo(Screen.Paywall.route) { inclusive = true }
                         }
-                    }
+                    },
+                    onBack = { navController.popBackStack() }
                 )
             }
             composable(Screen.Dashboard.route) {
@@ -125,13 +144,15 @@ fun StockGuardNavHost(navStartViewModel: NavStartViewModel = hiltViewModel()) {
                     },
                     onLowStockClick = { navController.navigate(Screen.Alerts.createRoute(AlertFilter.LOW_STOCK)) },
                     onOutOfStockClick = { navController.navigate(Screen.Alerts.createRoute(AlertFilter.OUT_OF_STOCK)) },
-                    onProductClick = { id -> navController.navigate(Screen.ProductDetail.createRoute(id)) }
+                    onProductClick = { id -> navController.navigate(Screen.ProductDetail.createRoute(id)) },
+                    hasActiveAccess = hasActiveAccess,
+                    onSubscribeRequired = { showSubscriptionDialog = true }
                 )
             }
             composable(Screen.Products.route) {
                 ProductListScreen(
                     onProductClick = { id -> navController.navigate(Screen.ProductDetail.createRoute(id)) },
-                    onAddProduct = { navController.navigate(Screen.AddEditProduct.createRoute()) },
+                    onAddProduct = { requireSubscription { navController.navigate(Screen.AddEditProduct.createRoute()) } },
                     onScanBarcode = { navController.navigate(Screen.ScanBarcode.createRoute(ScanMode.LOOKUP)) }
                 )
             }
@@ -143,7 +164,9 @@ fun StockGuardNavHost(navStartViewModel: NavStartViewModel = hiltViewModel()) {
                 ProductDetailScreen(
                     productId = productId,
                     onDeleted = { navController.popBackStack() },
-                    onEdit = { id -> navController.navigate(Screen.AddEditProduct.createRoute(productId = id)) }
+                    onEdit = { id -> requireSubscription { navController.navigate(Screen.AddEditProduct.createRoute(productId = id)) } },
+                    hasActiveAccess = hasActiveAccess,
+                    onSubscribeRequired = { showSubscriptionDialog = true }
                 )
             }
             composable(
@@ -209,8 +232,10 @@ fun StockGuardNavHost(navStartViewModel: NavStartViewModel = hiltViewModel()) {
                         }
                     },
                     onAddProductWithBarcode = { code ->
-                        navController.navigate(Screen.AddEditProduct.createRoute(barcode = code)) {
-                            popUpTo(Screen.Products.route)
+                        requireSubscription {
+                            navController.navigate(Screen.AddEditProduct.createRoute(barcode = code)) {
+                                popUpTo(Screen.Products.route)
+                            }
                         }
                     },
                     onCancel = { navController.popBackStack() }
@@ -218,7 +243,7 @@ fun StockGuardNavHost(navStartViewModel: NavStartViewModel = hiltViewModel()) {
             }
             composable(Screen.Orders.route) {
                 OrdersScreen(
-                    onCreateOrder = { type -> navController.navigate(Screen.CreateOrder.createRoute(type)) },
+                    onCreateOrder = { type -> requireSubscription { navController.navigate(Screen.CreateOrder.createRoute(type)) } },
                     onOrderClick = { id -> navController.navigate(Screen.OrderDetail.createRoute(id)) }
                 )
             }
@@ -239,17 +264,25 @@ fun StockGuardNavHost(navStartViewModel: NavStartViewModel = hiltViewModel()) {
                 val orderId = decodeRouteParam(entry.arguments?.getString("orderId").orEmpty())
                 OrderDetailScreen(
                     orderId = orderId,
-                    onDeleted = { navController.popBackStack() }
+                    onDeleted = { navController.popBackStack() },
+                    hasActiveAccess = hasActiveAccess,
+                    onSubscribeRequired = { showSubscriptionDialog = true }
                 )
             }
             composable(Screen.Reports.route) {
                 ReportsScreen()
             }
             composable(Screen.Categories.route) {
-                CategoriesScreen()
+                CategoriesScreen(
+                    hasActiveAccess = hasActiveAccess,
+                    onSubscribeRequired = { showSubscriptionDialog = true }
+                )
             }
             composable(Screen.Companies.route) {
-                CompaniesScreen()
+                CompaniesScreen(
+                    hasActiveAccess = hasActiveAccess,
+                    onSubscribeRequired = { showSubscriptionDialog = true }
+                )
             }
             composable(
                 route = Screen.Alerts.route,
@@ -276,9 +309,21 @@ fun StockGuardNavHost(navStartViewModel: NavStartViewModel = hiltViewModel()) {
                         navController.navigate(Screen.Onboarding.route) {
                             popUpTo(navController.graph.id) { inclusive = true }
                         }
-                    }
+                    },
+                    hasActiveAccess = hasActiveAccess,
+                    onSubscribeRequired = { showSubscriptionDialog = true }
                 )
             }
         }
+    }
+
+    if (showSubscriptionDialog) {
+        SubscriptionRequiredDialog(
+            onDismiss = { showSubscriptionDialog = false },
+            onSubscribe = {
+                showSubscriptionDialog = false
+                navController.navigate(Screen.Paywall.route)
+            }
+        )
     }
 }

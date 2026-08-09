@@ -11,7 +11,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -40,6 +44,7 @@ import com.stockguardplus.app.ui.theme.StockGood
 @Composable
 fun PaywallScreen(
     onSubscribed: () -> Unit,
+    onBack: (() -> Unit)? = null,
     viewModel: PaywallViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -49,7 +54,20 @@ fun PaywallScreen(
         if (uiState is PaywallUiState.Verified) onSubscribed()
     }
 
-    Scaffold(topBar = { TopAppBar(title = { Text(stringResource(R.string.screen_paywall)) }) }) { innerPadding ->
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.screen_paywall)) },
+                navigationIcon = {
+                    if (onBack != null) {
+                        IconButton(onClick = onBack) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_cancel))
+                        }
+                    }
+                }
+            )
+        }
+    ) { innerPadding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -95,6 +113,11 @@ fun PaywallScreen(
                             .forEach { offer ->
                                 PlanCard(offer = offer, onSelect = { viewModel.selectPlan(activity, offer) })
                             }
+                        if (onBack != null) {
+                            TextButton(onClick = onBack, modifier = Modifier.fillMaxWidth()) {
+                                Text(stringResource(R.string.paywall_continue_with_demo))
+                            }
+                        }
                     }
                 }
             }

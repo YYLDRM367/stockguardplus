@@ -31,16 +31,26 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.stockguardplus.app.R
 import com.stockguardplus.app.ui.components.AddCompanyDialog
+import com.stockguardplus.app.ui.components.SubscriptionRequiredDialog
 
 @Composable
-fun CompaniesScreen(viewModel: CompaniesViewModel = hiltViewModel()) {
+fun CompaniesScreen(
+    hasActiveAccess: Boolean,
+    onSubscribeRequired: () -> Unit,
+    viewModel: CompaniesViewModel = hiltViewModel()
+) {
     val companies by viewModel.companies.collectAsState()
     var showAddDialog by remember { mutableStateOf(false) }
+    var showSubscriptionDialog by remember { mutableStateOf(false) }
+
+    fun requireSubscription(action: () -> Unit) {
+        if (hasActiveAccess) action() else showSubscriptionDialog = true
+    }
 
     Scaffold(
         topBar = { TopAppBar(title = { Text(stringResource(R.string.screen_companies)) }) },
         floatingActionButton = {
-            FloatingActionButton(onClick = { showAddDialog = true }) {
+            FloatingActionButton(onClick = { requireSubscription { showAddDialog = true } }) {
                 Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.action_add_company))
             }
         }
@@ -70,7 +80,7 @@ fun CompaniesScreen(viewModel: CompaniesViewModel = hiltViewModel()) {
                             if (company.address.isNotBlank()) Text(company.address)
                         },
                         trailingContent = {
-                            IconButton(onClick = { viewModel.deleteCompany(company.id) }) {
+                            IconButton(onClick = { requireSubscription { viewModel.deleteCompany(company.id) } }) {
                                 Icon(Icons.Filled.Delete, contentDescription = stringResource(R.string.action_delete))
                             }
                         }
@@ -86,6 +96,16 @@ fun CompaniesScreen(viewModel: CompaniesViewModel = hiltViewModel()) {
             onConfirm = { name, address, phone1, phone2, email ->
                 viewModel.addCompany(name, address, phone1, phone2, email)
                 showAddDialog = false
+            }
+        )
+    }
+
+    if (showSubscriptionDialog) {
+        SubscriptionRequiredDialog(
+            onDismiss = { showSubscriptionDialog = false },
+            onSubscribe = {
+                showSubscriptionDialog = false
+                onSubscribeRequired()
             }
         )
     }

@@ -176,4 +176,9 @@
     <string name="action_dismiss">Dismiss</string>
     <string name="confirm_clear_demo_data_title">Clear sample data</string>
     <string name="confirm_clear_demo_data_message">This removes every sample category, product, company, and order — nothing you\'ve entered yourself will be touched. This can\'t be undone.</string>
+
+    <string name="subscription_required_title">Subscribe to continue</string>
+    <string name="subscription_required_message">You can browse and explore sample data for free. Adding, editing, or approving your own data needs an active subscription.</string>
+    <string name="action_subscribe">Subscribe</string>
+    <string name="paywall_continue_with_demo">Not now — keep exploring</string>
 </resources>

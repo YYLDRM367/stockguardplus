@@ -38,6 +38,7 @@ import com.stockguardplus.app.R
 import com.stockguardplus.app.data.model.Movement
 import com.stockguardplus.app.data.model.MovementType
 import com.stockguardplus.app.ui.components.StockStatusChip
+import com.stockguardplus.app.ui.components.SubscriptionRequiredDialog
 import com.stockguardplus.app.ui.theme.PaperBorder
 import com.stockguardplus.app.ui.theme.PaperMuted
 import com.stockguardplus.app.ui.theme.PaperSurface
@@ -49,6 +50,8 @@ fun ProductDetailScreen(
     productId: String,
     onDeleted: () -> Unit,
     onEdit: (String) -> Unit,
+    hasActiveAccess: Boolean,
+    onSubscribeRequired: () -> Unit,
     viewModel: ProductDetailViewModel = hiltViewModel()
 ) {
     LaunchedEffect(productId) { viewModel.load(productId) }
@@ -60,6 +63,11 @@ fun ProductDetailScreen(
     val isDeleted by viewModel.isDeleted.collectAsState()
 
     var showDeleteDialog by remember { mutableStateOf(false) }
+    var showSubscriptionDialog by remember { mutableStateOf(false) }
+
+    fun requireSubscription(action: () -> Unit) {
+        if (hasActiveAccess) action() else showSubscriptionDialog = true
+    }
 
     LaunchedEffect(isDeleted) {
         if (isDeleted) onDeleted()
@@ -75,7 +83,7 @@ fun ProductDetailScreen(
                     IconButton(onClick = { onEdit(productId) }) {
                         Icon(Icons.Filled.Edit, contentDescription = stringResource(R.string.action_edit))
                     }
-                    IconButton(onClick = { showDeleteDialog = true }) {
+                    IconButton(onClick = { requireSubscription { showDeleteDialog = true } }) {
                         Icon(Icons.Filled.Delete, contentDescription = stringResource(R.string.action_delete))
                     }
                 }
@@ -163,6 +171,16 @@ fun ProductDetailScreen(
                 TextButton(onClick = { showDeleteDialog = false }) {
                     Text(stringResource(R.string.action_cancel))
                 }
+            }
+        )
+    }
+
+    if (showSubscriptionDialog) {
+        SubscriptionRequiredDialog(
+            onDismiss = { showSubscriptionDialog = false },
+            onSubscribe = {
+                showSubscriptionDialog = false
+                onSubscribeRequired()
             }
         )
     }

@@ -48,6 +48,8 @@ fun DashboardScreen(
     onLowStockClick: () -> Unit,
     onOutOfStockClick: () -> Unit,
     onProductClick: (String) -> Unit,
+    hasActiveAccess: Boolean,
+    onSubscribeRequired: () -> Unit,
     viewModel: DashboardViewModel = hiltViewModel()
 ) {
     val products by viewModel.products.collectAsState()
@@ -56,6 +58,10 @@ fun DashboardScreen(
     val showDemoPrompt by viewModel.showDemoPrompt.collectAsState()
     val hasDemoData by viewModel.hasDemoData.collectAsState()
     var bannerDismissed by rememberSaveable { mutableStateOf(false) }
+
+    fun requireSubscriptionForClear() {
+        if (hasActiveAccess) viewModel.clearDemoData() else onSubscribeRequired()
+    }
     val lowStockCount = products.count { it.status == StockStatus.LOW_STOCK }
     val outOfStockCount = products.count { it.status == StockStatus.OUT_OF_STOCK }
 
@@ -77,7 +83,7 @@ fun DashboardScreen(
         ) {
             if (hasDemoData && !bannerDismissed) {
                 DemoDataBanner(
-                    onClear = viewModel::clearDemoData,
+                    onClear = { requireSubscriptionForClear() },
                     onDismiss = { bannerDismissed = true }
                 )
             }
