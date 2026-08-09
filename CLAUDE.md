@@ -359,16 +359,20 @@ page). The old `subscriptionPlan: "free"` default was removed from both
 now has no entitlement at all until `verifyPurchase` writes real fields;
 that part of the model is unchanged, only *when* the app asks for it.
 
-**Web is now stale relative to this revision** — Faz 5 (web) gates the
-entire authenticated app behind `hasActiveAccess()` in `App.tsx`
-(`SubscriptionRequiredPage` for anyone not entitled), matching the old
-Android "Paywall first" behavior, not the new browse-free model. Revisit
-this together with the deferred web Hosting deploy (see below) — worth
-deciding whether web should also move to a browse-free/gate-on-write
-model before it goes live, so the two platforms behave consistently. Not
-started: end-to-end testing with license testers (Faz 6 — not yet
-confirmed license testers are added in Play Console), Play Console
-monetization submission declarations (Faz 7).
+**Web now matches this same browse-free/gate-on-write model** (updated
+2026-08-09): `App.tsx` no longer blocks the whole app behind
+`hasActiveAccess()` — every signed-in user reaches `AppLayout` and can
+view Dashboard/Products/Orders/Reports/Settings freely. Individual write
+actions (add/edit/delete product or category, add/delete company, create/
+approve/delete order) check `hasActiveAccess(organization)` first and
+show a `SubscriptionRequiredNotice` (`components/`) inline instead of
+performing the action. Unlike Android there's no in-web Paywall to route
+to — Play Billing purchases only start on Android — so the notice just
+explains that and points back to the mobile app; the old full-page
+`SubscriptionRequiredPage` was deleted since nothing blocks browsing
+anymore. Not started: end-to-end testing with license testers (Faz 6 —
+not yet confirmed license testers are added in Play Console), Play
+Console monetization submission declarations (Faz 7).
 
 ## Demo data
 
