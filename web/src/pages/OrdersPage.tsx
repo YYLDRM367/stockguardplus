@@ -1,16 +1,19 @@
 import { useEffect, useState } from "react";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
+import { SubscriptionRequiredNotice } from "../components/SubscriptionRequiredNotice";
 import { db } from "../firebase";
-import type { Order, OrderType, Party } from "../types";
+import { hasActiveAccess, type Order, type OrderType, type Party } from "../types";
 
 export function OrdersPage() {
-  const { orgId } = useAuth();
+  const { orgId, organization } = useAuth();
+  const navigate = useNavigate();
   const [tab, setTab] = useState<OrderType>("purchase");
   const [orders, setOrders] = useState<Order[]>([]);
   const [parties, setParties] = useState<Party[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showSubscriptionNotice, setShowSubscriptionNotice] = useState(false);
 
   useEffect(() => {
     if (!orgId) return;
@@ -39,10 +42,19 @@ export function OrdersPage() {
     <div>
       <div className="page-header">
         <h1>Siparişler</h1>
-        <Link className="link-button" to={`/orders/new?type=${tab}`}>
+        <button
+          type="button"
+          className="link-button"
+          onClick={() => {
+            if (hasActiveAccess(organization)) navigate(`/orders/new?type=${tab}`);
+            else setShowSubscriptionNotice(true);
+          }}
+        >
           + Sipariş oluştur
-        </Link>
+        </button>
       </div>
+
+      {showSubscriptionNotice && <SubscriptionRequiredNotice onDismiss={() => setShowSubscriptionNotice(false)} />}
 
       <div className="chip-row" style={{ marginBottom: 16 }}>
         <button className={`chip ${tab === "purchase" ? "selected" : ""}`} onClick={() => setTab("purchase")}>

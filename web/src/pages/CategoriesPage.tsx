@@ -11,15 +11,22 @@ import {
   writeBatch
 } from "firebase/firestore";
 import { useAuth } from "../auth/AuthContext";
+import { SubscriptionRequiredNotice } from "../components/SubscriptionRequiredNotice";
 import { db } from "../firebase";
-import type { Category } from "../types";
+import { hasActiveAccess, type Category } from "../types";
 
 export function CategoriesPage() {
-  const { orgId } = useAuth();
+  const { orgId, organization } = useAuth();
   const [categories, setCategories] = useState<Category[]>([]);
   const [newName, setNewName] = useState("");
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState("");
+  const [showSubscriptionNotice, setShowSubscriptionNotice] = useState(false);
+
+  function requireSubscription(action: () => void) {
+    if (hasActiveAccess(organization)) action();
+    else setShowSubscriptionNotice(true);
+  }
 
   useEffect(() => {
     if (!orgId) return;
@@ -83,11 +90,13 @@ export function CategoriesPage() {
             onChange={(e) => setNewName(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleAdd()}
           />
-          <button className="link-button" onClick={handleAdd}>
+          <button className="link-button" onClick={() => requireSubscription(handleAdd)}>
             Ekle
           </button>
         </div>
       </div>
+
+      {showSubscriptionNotice && <SubscriptionRequiredNotice onDismiss={() => setShowSubscriptionNotice(false)} />}
 
       {categories.length === 0 ? (
         <p className="empty-state">Henüz kategori yok.</p>
@@ -115,10 +124,10 @@ export function CategoriesPage() {
                 <>
                   <span className="name">{category.name}</span>
                   <div style={{ display: "flex", gap: 8 }}>
-                    <button className="secondary-button" onClick={() => startRename(category)}>
+                    <button className="secondary-button" onClick={() => requireSubscription(() => startRename(category))}>
                       Yeniden adlandır
                     </button>
-                    <button className="danger-button" onClick={() => handleDelete(category.id)}>
+                    <button className="danger-button" onClick={() => requireSubscription(() => handleDelete(category.id))}>
                       Sil
                     </button>
                   </div>

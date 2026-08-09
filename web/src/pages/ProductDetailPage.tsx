@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams, Link } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { collection, deleteDoc, doc, onSnapshot, query, where } from "firebase/firestore";
 import { useAuth } from "../auth/AuthContext";
+import { SubscriptionRequiredNotice } from "../components/SubscriptionRequiredNotice";
 import { db } from "../firebase";
-import { productStatus, type Category, type Movement, type Product } from "../types";
+import { hasActiveAccess, productStatus, type Category, type Movement, type Product } from "../types";
 
 export function ProductDetailPage() {
-  const { orgId } = useAuth();
+  const { orgId, organization } = useAuth();
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -14,6 +15,12 @@ export function ProductDetailPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [movements, setMovements] = useState<Movement[]>([]);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [showSubscriptionNotice, setShowSubscriptionNotice] = useState(false);
+
+  function requireSubscription(action: () => void) {
+    if (hasActiveAccess(organization)) action();
+    else setShowSubscriptionNotice(true);
+  }
 
   useEffect(() => {
     if (!orgId || !id) return;
@@ -66,14 +73,20 @@ export function ProductDetailPage() {
       <div className="page-header">
         <h1>{product.name}</h1>
         <div style={{ display: "flex", gap: 8 }}>
-          <Link className="secondary-button" to={`/products/${product.id}/edit`}>
+          <button
+            type="button"
+            className="secondary-button"
+            onClick={() => requireSubscription(() => navigate(`/products/${product.id}/edit`))}
+          >
             Düzenle
-          </Link>
-          <button className="danger-button" onClick={() => setConfirmingDelete(true)}>
+          </button>
+          <button className="danger-button" onClick={() => requireSubscription(() => setConfirmingDelete(true))}>
             Sil
           </button>
         </div>
       </div>
+
+      {showSubscriptionNotice && <SubscriptionRequiredNotice onDismiss={() => setShowSubscriptionNotice(false)} />}
 
       <div className="detail-grid">
         <div className="detail-field">

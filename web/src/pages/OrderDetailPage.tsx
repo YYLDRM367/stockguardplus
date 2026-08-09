@@ -10,13 +10,14 @@ import {
   serverTimestamp
 } from "firebase/firestore";
 import { useAuth } from "../auth/AuthContext";
+import { SubscriptionRequiredNotice } from "../components/SubscriptionRequiredNotice";
 import { db } from "../firebase";
-import type { Order, Party, Product } from "../types";
+import { hasActiveAccess, type Order, type Party, type Product } from "../types";
 
 class InsufficientStockError extends Error {}
 
 export function OrderDetailPage() {
-  const { orgId } = useAuth();
+  const { orgId, organization } = useAuth();
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -27,6 +28,12 @@ export function OrderDetailPage() {
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [approving, setApproving] = useState(false);
   const [approveError, setApproveError] = useState<string | null>(null);
+  const [showSubscriptionNotice, setShowSubscriptionNotice] = useState(false);
+
+  function requireSubscription(action: () => void) {
+    if (hasActiveAccess(organization)) action();
+    else setShowSubscriptionNotice(true);
+  }
 
   useEffect(() => {
     if (!orgId || !id) return;
@@ -129,15 +136,17 @@ export function OrderDetailPage() {
         <h1>{dateLabel}</h1>
         {order.status === "draft" && (
           <div style={{ display: "flex", gap: 8 }}>
-            <button className="primary-button" onClick={() => setConfirmingApprove(true)}>
+            <button className="primary-button" onClick={() => requireSubscription(() => setConfirmingApprove(true))}>
               Onayla
             </button>
-            <button className="danger-button" onClick={() => setConfirmingDelete(true)}>
+            <button className="danger-button" onClick={() => requireSubscription(() => setConfirmingDelete(true))}>
               Sil
             </button>
           </div>
         )}
       </div>
+
+      {showSubscriptionNotice && <SubscriptionRequiredNotice onDismiss={() => setShowSubscriptionNotice(false)} />}
 
       <div className="detail-grid">
         <div className="detail-field">

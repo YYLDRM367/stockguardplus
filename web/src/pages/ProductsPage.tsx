@@ -1,12 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { collection, onSnapshot } from "firebase/firestore";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
+import { SubscriptionRequiredNotice } from "../components/SubscriptionRequiredNotice";
 import { db } from "../firebase";
-import { productStatus, type Category, type Product } from "../types";
+import { hasActiveAccess, productStatus, type Category, type Product } from "../types";
 
 export function ProductsPage() {
-  const { orgId } = useAuth();
+  const { orgId, organization } = useAuth();
+  const navigate = useNavigate();
+  const [showSubscriptionNotice, setShowSubscriptionNotice] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -44,10 +47,19 @@ export function ProductsPage() {
     <div>
       <div className="page-header">
         <h1>Ürünler</h1>
-        <Link className="link-button" to="/products/new">
+        <button
+          type="button"
+          className="link-button"
+          onClick={() => {
+            if (hasActiveAccess(organization)) navigate("/products/new");
+            else setShowSubscriptionNotice(true);
+          }}
+        >
           + Ürün ekle
-        </Link>
+        </button>
       </div>
+
+      {showSubscriptionNotice && <SubscriptionRequiredNotice onDismiss={() => setShowSubscriptionNotice(false)} />}
 
       <div className="filters-row">
         <input

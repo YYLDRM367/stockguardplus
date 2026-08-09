@@ -1,13 +1,20 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { addDoc, collection, deleteDoc, doc, onSnapshot } from "firebase/firestore";
 import { useAuth } from "../auth/AuthContext";
+import { SubscriptionRequiredNotice } from "../components/SubscriptionRequiredNotice";
 import { db } from "../firebase";
-import type { Party } from "../types";
+import { hasActiveAccess, type Party } from "../types";
 
 export function CompaniesPage() {
-  const { orgId } = useAuth();
+  const { orgId, organization } = useAuth();
   const [parties, setParties] = useState<Party[]>([]);
   const [showForm, setShowForm] = useState(false);
+  const [showSubscriptionNotice, setShowSubscriptionNotice] = useState(false);
+
+  function requireSubscription(action: () => void) {
+    if (hasActiveAccess(organization)) action();
+    else setShowSubscriptionNotice(true);
+  }
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
   const [phone1, setPhone1] = useState("");
@@ -70,11 +77,13 @@ export function CompaniesPage() {
       <div className="page-header">
         <h1>Firmalar</h1>
         {!showForm && (
-          <button className="link-button" onClick={() => setShowForm(true)}>
+          <button className="link-button" onClick={() => requireSubscription(() => setShowForm(true))}>
             + Firma ekle
           </button>
         )}
       </div>
+
+      {showSubscriptionNotice && <SubscriptionRequiredNotice onDismiss={() => setShowSubscriptionNotice(false)} />}
 
       {showForm && (
         <form className="form-card" onSubmit={handleSubmit}>
@@ -124,7 +133,7 @@ export function CompaniesPage() {
                   <div className="sku">{[party.phone1, party.email].filter(Boolean).join(" · ")}</div>
                 )}
               </div>
-              <button className="danger-button" onClick={() => handleDelete(party.id)}>
+              <button className="danger-button" onClick={() => requireSubscription(() => handleDelete(party.id))}>
                 Sil
               </button>
             </div>
