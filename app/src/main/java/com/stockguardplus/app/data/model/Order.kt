@@ -2,6 +2,7 @@ package com.stockguardplus.app.data.model
 
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentId
+import com.google.firebase.firestore.PropertyName
 import com.google.firebase.firestore.ServerTimestamp
 
 enum class OrderType(val value: String) {
@@ -39,6 +40,7 @@ data class Order(
     val userId: String = "",
     @ServerTimestamp val createdAt: Timestamp? = null,
     val approvedAt: Timestamp? = null,
+    @get:PropertyName("isDemo")
     val isDemo: Boolean = false
 ) {
     val orderType: OrderType get() = OrderType.fromValue(type)

@@ -2,6 +2,7 @@ package com.stockguardplus.app.data.model
 
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentId
+import com.google.firebase.firestore.PropertyName
 import com.google.firebase.firestore.ServerTimestamp
 
 enum class MovementType {
@@ -17,6 +18,7 @@ data class Movement(
     val orderId: String = "",
     val userId: String = "",
     @ServerTimestamp val timestamp: Timestamp? = null,
+    @get:PropertyName("isDemo")
     val isDemo: Boolean = false
 ) {
     val movementType: MovementType
